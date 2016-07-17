@@ -65,4 +65,4 @@ class TSucc(Rule):
             return [TimesIs(n1.prev, n2, n3), PlusIs(n2, n3, n4)]
 
 
-nat_system = System([PZero, PSucc, TZero, TSucc])
+nat_system = System([PZero(), PSucc(), TZero(), TSucc()])

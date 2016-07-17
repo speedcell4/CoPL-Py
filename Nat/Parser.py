@@ -8,14 +8,14 @@ with Parser() as nat:
     nat.define(s | z)
 
 with Parser() as assertion:
-    plus_is = pure(lambda a: lambda b: lambda c: PlusIs(a, b, c)) + nat \
+    plus_is = pure(lambda a: lambda b: lambda c: PlusIs(a, b, c)) \
+              + nat \
               + (spaces >> string('plus') >> spaces >> nat) \
               + (spaces >> string('is') >> spaces >> nat)
-    times_is = pure(lambda a: lambda b: lambda c: TimesIs(a, b, c)) + nat \
-               + (spaces >> string('times') >> spaces + nat) \
-               + (spaces >> string('is') >> spaces + nat)
+    times_is = pure(lambda a: lambda b: lambda c: TimesIs(a, b, c)) \
+               + nat \
+               + (spaces >> string('times') >> spaces >> nat) \
+               + (spaces >> string('is') >> spaces >> nat)
     assertion.define(plus_is | times_is)
 
 # assertion = assertion + eof
-
-print(plus_is.run(r'Z plus Z is Z'))

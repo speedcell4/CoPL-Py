@@ -102,7 +102,7 @@ alpha = satisfy(str.isalpha)
 def many(parser: Parser) -> Parser:
     with Parser() as retval:
         collection = pure(lambda a: lambda b: a + b) + parser + retval
-        empty = pure([])  # TODO [] or ''
+        empty = pure('')  # TODO [] or ''
         retval.define(collection | empty)
         return retval
 

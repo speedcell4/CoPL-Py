@@ -1,5 +1,6 @@
 from typing import List
 from Base.Parser import Parser, EOF
+from Base import util
 
 
 class Assertion(object):
@@ -20,21 +21,25 @@ class Rule(object):
 class System(object):
     def __init__(self, rules: List[Rule]):
         assert isinstance(rules, list)
-        assert all(issubclass(rule, Rule) for rule in rules)
         self.rules = rules
 
     def __call__(self, assertion: Assertion, depth=0) -> str:
-        def indent():
+        def indent(depth):
             return ' ' * depth * 2
 
         for rule in self.rules:
-            subs = rule(assertion)
-            if subs is None:
-                continue
-            else:
-                head = indent() + '{} by {} {\n'.format(assertion, rule)
-                mild = ';\n'.join(self(sub, depth + 1) for sub in subs)
-                return head + mild + indent() + '\n}'
+            if util.DEBUG:
+                print('rule: {}, assertion: {}'.format(rule, assertion))
+            try:
+                subs = rule(assertion)
+                if subs is None:
+                    continue
+                else:
+                    head = indent(depth) + '{} by {} {{\n'.format(assertion, rule.name)
+                    mild = ';\n'.join(self(sub, depth + 1) for sub in subs)
+                    return head + mild + '\n' + indent(depth) + '}'
+            except AssertionError as e:
+                pass
 
 
 class Solver(object):
@@ -43,4 +48,7 @@ class Solver(object):
         self.system = system
 
     def __call__(self, raw: str) -> str:
-        return self.system(self.parser.run(raw + EOF))
+        ast = self.parser.run(raw)
+        if util.DEBUG:
+            print('ast: {}'.format(ast))
+        return self.system(ast)
