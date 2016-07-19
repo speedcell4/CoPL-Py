@@ -1,6 +1,6 @@
 from typing import List
-from Base.Parser import Parser, EOF
-from Base import util
+from base.parser import Parser, EOF, eof
+from base import util
 
 
 class Assertion(object):
@@ -24,8 +24,8 @@ class System(object):
         self.rules = rules
 
     def __call__(self, assertion: Assertion, depth=0) -> str:
-        def indent(depth):
-            return ' ' * depth * 2
+        def indent(n):
+            return ' ' * n * 2
 
         for rule in self.rules:
             if util.DEBUG:
@@ -38,7 +38,7 @@ class System(object):
                     head = indent(depth) + '{} by {} {{\n'.format(assertion, rule.name)
                     mild = ';\n'.join(self(sub, depth + 1) for sub in subs)
                     return head + mild + '\n' + indent(depth) + '}'
-            except AssertionError as e:
+            except AssertionError as _:
                 pass
 
 

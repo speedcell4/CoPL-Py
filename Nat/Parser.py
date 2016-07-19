@@ -1,6 +1,6 @@
-from Base.Parser import string, pure, Parser, space, spaces, eof
-from Nat.Types import Z, S
-from Nat.Rules import PlusIs, TimesIs
+from base.parser import string, pure, Parser, spaces
+from Nat.rule import PlusIs, TimesIs
+from Nat.data import Z, S
 
 with Parser() as nat:
     z = string('Z') >> pure(Z())
@@ -17,5 +17,3 @@ with Parser() as assertion:
                + (spaces >> string('times') >> spaces >> nat) \
                + (spaces >> string('is') >> spaces >> nat)
     assertion.define(plus_is | times_is)
-
-# assertion = assertion + eof

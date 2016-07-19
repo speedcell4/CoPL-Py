@@ -1,5 +1,6 @@
 from typing import Tuple, Any, Callable
 
+# TODO can not be parsed correctly now
 EOF = '<EOF>'
 
 
@@ -99,12 +100,12 @@ digit = satisfy(str.isdigit)
 alpha = satisfy(str.isalpha)
 
 
-def many(parser: Parser) -> Parser:
-    with Parser() as retval:
-        collection = pure(lambda a: lambda b: a + b) + parser + retval
+def many(item: Parser) -> Parser:
+    with Parser() as parser:
+        collection = pure(lambda a: lambda b: a + b) + item + parser
         empty = pure('')  # TODO [] or ''
-        retval.define(collection | empty)
-        return retval
+        parser.define(collection | empty)
+        return parser
 
 
 spaces = many(space)
