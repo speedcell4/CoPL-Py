@@ -9,5 +9,5 @@ Nat = Solver(assertion, nat_system)
 if __name__ == '__main__':
     import unittest
 
-    miao = generate_unittest(Nat, range(1, 9))
+    _ = generate_unittest(Nat, range(1, 9))
     unittest.main()

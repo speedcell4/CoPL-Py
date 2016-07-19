@@ -11,6 +11,9 @@ class Nat(object):
     def __str__(self) -> str:
         raise NotImplementedError
 
+    def __lt__(self, other: 'Nat') -> bool:
+        raise NotImplementedError
+
 
 class Z(Nat):
     def __eq__(self, other: 'Nat') -> bool:
@@ -28,8 +31,11 @@ class Z(Nat):
     def __str__(self):
         return 'Z'
 
-    def __repr__(self):
-        return str(self)
+    def __lt__(self, other: 'Nat') -> bool:
+        if isinstance(other, S):
+            return True
+        else:
+            return False
 
 
 class S(Nat):
@@ -55,5 +61,8 @@ class S(Nat):
     def __str__(self):
         return 'S({})'.format(self.prev)
 
-    def __repr__(self):
-        return str(self)
+    def __lt__(self, other: 'Nat') -> bool:
+        if isinstance(other, S):
+            return self.prev < other.prev
+        else:
+            return False
