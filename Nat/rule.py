@@ -1,7 +1,7 @@
 from typing import List
 
-from base.derivation import Assertion, Rule, System
 from Nat.data import Nat, S, Z
+from bases.derivation import Assertion, Rule, System
 
 
 class PlusIs(Assertion):

@@ -1,8 +1,8 @@
-from base.util import generate_unittest
-
 from base.derivation import Solver
+
 from Nat.parser import assertion
 from Nat.rule import nat
+from bases.util import generate_unittest
 
 Nat = Solver(assertion, nat)
 

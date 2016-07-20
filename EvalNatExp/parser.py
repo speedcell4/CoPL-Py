@@ -1,6 +1,6 @@
 from EvalNatExp.data import ExpNat, ExpPlus, ExpTimes
 from Nat.parser import nat
-from base.parser import Parser, spaces, pure, string, eof, EOF
+from bases.parser import Parser, spaces, pure, string, eof, EOF
 
 with Parser() as exp:
     exp_nat = Parser()

@@ -1,8 +1,6 @@
-from typing import Tuple, Any, Callable, Dict, List
-from base.util import DEBUG
-from base.mixins import BaseToken, Token, Operator, UnaryOp, BinaryOp, TrinaryOp
-from functools import reduce
-from itertools import groupby
+from typing import Tuple, Any, Callable
+
+from bases.util import DEBUG
 
 # TODO can not be parsed correctly now
 EOF = ''

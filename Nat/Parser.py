@@ -1,6 +1,6 @@
-from base.parser import string, pure, Parser, spaces
-from Nat.rule import PlusIs, TimesIs
 from Nat.data import Z, S
+from Nat.rule import PlusIs, TimesIs
+from bases.parser import string, pure, Parser, spaces
 
 with Parser() as nat:
     z = string('Z') >> pure(Z())

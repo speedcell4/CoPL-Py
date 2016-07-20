@@ -1,7 +1,9 @@
 from typing import List
+
 from base.derivation import Assertion, Rule, System
+
 from CompareNat.data import Nat, Z, S
-from base.util import DEBUG
+from bases.util import DEBUG
 
 
 class IsLessThan(Assertion):

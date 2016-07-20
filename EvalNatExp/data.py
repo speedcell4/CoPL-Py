@@ -1,5 +1,5 @@
-from Nat.data import Nat, S, Z
-from base.mixins import BaseToken, Token, Operator, BinaryOp
+from Nat.data import Nat
+from bases.mixins import Token, BinaryOp
 
 
 class Exp(object):

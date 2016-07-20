@@ -1,6 +1,8 @@
 from typing import List
+
 from base.parser import Parser, EOF, eof
-from base import util
+
+from bases import util
 
 
 class Assertion(object):

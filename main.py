@@ -1,8 +1,8 @@
-from Nat import Nat
 from CompareNat import CompareNat1
 from CompareNat import CompareNat2
 from CompareNat import CompareNat3
-from base.util import load_problem, dump_answer
+from Nat import Nat
+from bases.util import load_problem, dump_answer
 
 systems = {
     'Nat'.lower(): Nat,
