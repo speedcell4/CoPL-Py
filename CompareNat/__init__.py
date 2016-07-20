@@ -1,4 +1,4 @@
-from base.derivation import Solver
+from bases.derivation import Solver
 
 from CompareNat.parser import assertion
 from CompareNat.rule import compare_nat1, compare_nat2, compare_nat3

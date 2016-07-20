@@ -1,6 +1,6 @@
 from typing import List
 
-from base.derivation import Assertion, Rule, System
+from bases.derivation import Assertion, Rule, System
 
 from CompareNat.data import Nat, Z, S
 from bases.util import DEBUG

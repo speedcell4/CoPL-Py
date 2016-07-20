@@ -3,12 +3,10 @@ from typing import Tuple, Any, Callable
 from bases.util import DEBUG
 
 # TODO can not be parsed correctly now
-EOF = ''
+EOF = '<EOF>'
 
 
 # TODO
-
-
 class ParsingError(Exception):
     pass
 

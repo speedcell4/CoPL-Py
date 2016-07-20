@@ -1,6 +1,6 @@
 from typing import List
 
-from base.parser import Parser, EOF, eof
+from bases.parser import Parser, EOF, eof
 
 from bases import util
 

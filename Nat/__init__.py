@@ -1,4 +1,4 @@
-from base.derivation import Solver
+from bases.derivation import Solver
 
 from Nat.parser import assertion
 from Nat.rule import nat
