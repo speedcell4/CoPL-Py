@@ -1,17 +1,17 @@
 from CompareNat.parser import assertion
-from CompareNat.rule import compareNat1, compareNat2, compareNat3
+from CompareNat.rule import compare_nat1, compare_nat2, compare_nat3
 from base.derivation import Solver
 
 from base.util import generate_unittest
 
-CompareNat1 = Solver(assertion, compareNat1)
-CompareNat2 = Solver(assertion, compareNat2)
-CompareNat3 = Solver(assertion, compareNat3)
+CompareNat1 = Solver(assertion, compare_nat1)
+CompareNat2 = Solver(assertion, compare_nat2)
+CompareNat3 = Solver(assertion, compare_nat3)
 
 if __name__ == '__main__':
     import unittest
 
-    a = generate_unittest(CompareNat1, [9, 12])
-    b = generate_unittest(CompareNat2, [10, 13])
-    c = generate_unittest(CompareNat3, [11, 14])
+    a = generate_unittest(r'CompareNat1', CompareNat1, [9, 12])
+    b = generate_unittest(r'CompareNat2', CompareNat2, [10, 13])
+    c = generate_unittest(r'CompareNat13', CompareNat3, [11, 14])
     unittest.main()

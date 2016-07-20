@@ -19,8 +19,9 @@ class LSucc(Rule):
     def __call__(self, assertion: Assertion) -> List[Assertion]:
         assert isinstance(assertion, IsLessThan)
         n1, n2 = assertion.args
-        if isinstance(n2, S) and n1 == n2.prev:
-            return []
+        if isinstance(n2, S):
+            if n1 == n2.prev:
+                return []
 
 
 class LTrans(Rule):
@@ -31,11 +32,11 @@ class LTrans(Rule):
         n1, n3 = assertion.args
         if DEBUG:
             print(n1, n3)
-        if n1 < n3:
+        if isinstance(n3, S) and n1 < n3:
             return [IsLessThan(n1, n3.prev), IsLessThan(n3.prev, n3)]
 
 
-compareNat1 = System([LSucc(), LTrans()])
+compare_nat1 = System([LSucc(), LTrans()])
 
 
 class LZero(Rule):
@@ -58,7 +59,7 @@ class LSuccSucc(Rule):
             return [IsLessThan(n1.prev, n2.prev)]
 
 
-compareNat2 = System([LZero(), LSuccSucc()])
+compare_nat2 = System([LZero(), LSuccSucc()])
 
 
 class LSuccR(Rule):
@@ -73,4 +74,4 @@ class LSuccR(Rule):
             return [IsLessThan(n1, n2.prev)]
 
 
-compareNat3 = System([LSucc(), LSuccR()])
+compare_nat3 = System([LSucc(), LSuccR()])

@@ -1,17 +1,23 @@
-from typing import Tuple, Any, Callable
+from typing import Tuple, Any, Callable, Dict, List
+from base.util import DEBUG
+from base.mixins import BaseToken, Token, Operator, UnaryOp, BinaryOp, TrinaryOp
+from functools import reduce
+from itertools import groupby
 
 # TODO can not be parsed correctly now
-EOF = '<EOF>'
+EOF = ''
 
 
 # TODO
+
+
 class ParsingError(Exception):
     pass
 
 
 class Parser(object):
     def __init__(self, fn=None):
-        self.fn = [fn]
+        self.fn = fn
 
     def __enter__(self):
         return self
@@ -23,13 +29,17 @@ class Parser(object):
         self.fn = parser.fn
 
     def run(self, raw: str) -> Any:
+        if DEBUG:
+            print(r'raw: {}'.format(raw))
         return self(raw)[1]
 
     def __call__(self, raw: str) -> Tuple[str, Any]:
-        return self.fn[0](raw)
+        assert isinstance(raw, str), r'raw should be str type instead of {}'.format(type(raw))
+
+        return self.fn(raw)
 
     def __add__(self, other: 'Parser') -> 'Parser':
-        assert isinstance(other, Parser)
+        assert isinstance(other, Parser), type(other)
 
         def wrapper(raw: str) -> Tuple[str, Any]:
             try:
@@ -79,7 +89,6 @@ class Parser(object):
 def pure(_: Any) -> Parser:
     @Parser
     def wrapper(raw: str):
-        assert isinstance(raw, str)
         return raw, _
 
     return wrapper
@@ -88,7 +97,6 @@ def pure(_: Any) -> Parser:
 def satisfy(condition: Callable[[str], bool]) -> Parser:
     @Parser
     def wrapper(raw: str):
-        assert isinstance(raw, str)
         if raw and condition(raw[0]):
             return raw[1:], raw[0]
 
@@ -131,12 +139,25 @@ def string(const: str) -> Parser:
 
     @Parser
     def wrapper(raw: str):
-        assert isinstance(raw, str), raw
-
         if raw.startswith(const):
             return raw[len(const):], raw[:len(const)]
 
     return wrapper
+
+
+# def infixes(token: Parser, ops: List[Operator]) -> Parser:
+#     def key(op: Operator) -> Tuple[int]:
+#         if isinstance(op, UnaryOp):
+#             return op.precedence, 1
+#         elif isinstance(op, BinaryOp):
+#             return op.precedence, 2
+#         elif isinstance(op, TrinaryOp):
+#             return op.precedence, 3
+# 
+#     with Parser() as expr:
+#         retval = (string(r'(') >> spaces >> expr << spaces << string(r')')) | token
+# 
+#         dict(groupby(ops, key=key)).items()
 
 
 eof = string(EOF)

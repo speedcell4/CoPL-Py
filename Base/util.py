@@ -22,13 +22,13 @@ def load_problem(index: int) -> str:
         return ''.join(reader.readlines()).strip()
 
 
-def generate_unittest(solve, indices: Iterable[int]) -> unittest.TestCase:
+def generate_unittest(name: str, solver, indices: Iterable[int]) -> unittest.TestCase:
     def test_method(index):
         def wrapper(self):
-            self.assertEqual(load_answer(index), solve(load_problem(index)))
+            self.assertEqual(load_answer(index), solver(load_problem(index)))
 
         return wrapper
 
-    return type('problem', (unittest.TestCase,), {
+    return type('Test{}'.format(name.capitalize()), (unittest.TestCase,), {
         'test_p{:03}'.format(index): test_method(index) for index in indices
         })

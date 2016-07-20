@@ -32,10 +32,7 @@ class Z(Nat):
         return 'Z'
 
     def __lt__(self, other: 'Nat') -> bool:
-        if isinstance(other, S):
-            return True
-        else:
-            return False
+        return isinstance(other, S)
 
 
 class S(Nat):

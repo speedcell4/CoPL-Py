@@ -17,6 +17,9 @@ class Rule(object):
     def __call__(self, assertion: Assertion) -> List[Assertion]:
         raise NotImplementedError
 
+    def __str__(self):
+        return self.name
+
 
 class System(object):
     def __init__(self, rules: List[Rule]):
@@ -44,11 +47,11 @@ class System(object):
 
 class Solver(object):
     def __init__(self, parser: 'Parser', system: 'System'):
-        self.parser = parser
+        self.parser = parser << eof
         self.system = system
 
     def __call__(self, raw: str) -> str:
-        ast = self.parser.run(raw)
+        ast = self.parser.run(raw + EOF)
         if util.DEBUG:
             print('ast: {}'.format(ast))
         return self.system(ast)
