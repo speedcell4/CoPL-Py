@@ -1,10 +1,10 @@
 from EvalNatExp.data import ExpNat, ExpPlus, ExpTimes
 from EvalNatExp.rule import EvalTo
 from Nat.parser import nat
-from bases.parser import Parser, pure, sstrings, paraphrase, infix
+from bases.parser import Parser, pure, sstrings, bracket, infix
 
 with Parser() as exp:
-    exp1 = paraphrase(r'(', exp, r')') | (pure(ExpNat) + nat)
+    exp1 = bracket(r'(', exp, r')') | (pure(ExpNat) + nat)
     exp2 = infix(ExpTimes, exp1)
     exp3 = infix(ExpPlus, exp2)
     exp.define(exp3)

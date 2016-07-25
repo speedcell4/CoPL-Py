@@ -1,4 +1,4 @@
-from typing import Tuple, Any, Callable
+from typing import Tuple, Any, Callable, Union
 
 from bases.mixins import BinaryOp
 from bases.util import DEBUG
@@ -146,7 +146,7 @@ sstrings = lambda const: spaces >> string(const) << spaces
 eof = string(EOF)
 
 
-def lassoic(op: BinaryOp, token: Parser) -> Parser:
+def chainl(op: type(BinaryOp), token: Parser) -> Parser:
     o = sstrings(op.operator)
     opt = pure(lambda a: lambda b: op(a, b))
     with Parser() as expr:
@@ -155,7 +155,7 @@ def lassoic(op: BinaryOp, token: Parser) -> Parser:
         return expr
 
 
-def rassoic(op: BinaryOp, token: Parser) -> Parser:
+def chainr(op: type(BinaryOp), token: Parser) -> Parser:
     o = sstrings(op.operator)
     opt = pure(lambda a: lambda b: op(a, b))
     with Parser() as expr:
@@ -165,12 +165,18 @@ def rassoic(op: BinaryOp, token: Parser) -> Parser:
 
 
 def infix(op: BinaryOp, token: Parser) -> Parser:
-    return [lassoic, rassoic][op.associate](op, token)
+    ops = [chainl, chainr]
+    assert 0 <= op.associate < len(ops)
+    return ops[op.associate](op, token)
 
 
-def paraphrase(l: str, parser: Parser, r: str) -> Parser:
-    return string(l) >> spaces >> parser << spaces << string(r)
+def bracket(l: Union[str, Parser], parser: Parser, r: Union[str, Parser]) -> Parser:
+    l = l if isinstance(l, Parser) else string(l)
+    r = r if isinstance(r, Parser) else string(r)
+    return l >> spaces >> parser << spaces << r
 
 
 if __name__ == '__main__':
-    pass
+    from ReduceNatExp.data import ExpPlus
+
+    infix(ExpPlus, Parser())
