@@ -1,8 +1,8 @@
 from typing import Tuple, Any, Callable
 
+from bases.mixins import BinaryOp
 from bases.util import DEBUG
 
-# TODO can not be parsed correctly now
 EOF = '<EOF>'
 
 
@@ -35,7 +35,7 @@ class Parser(object):
         return self.fn(raw)
 
     def __add__(self, other: 'Parser') -> 'Parser':
-        assert isinstance(other, Parser), type(other)
+        assert isinstance(other, Parser), '{} {}'.format(Parser, type(other))
 
         def wrapper(raw: str) -> Tuple[str, Any]:
             try:
@@ -141,19 +141,36 @@ def string(const: str) -> Parser:
     return wrapper
 
 
-# def infixes(token: Parser, ops: List[Operator]) -> Parser:
-#     def key(op: Operator) -> Tuple[int]:
-#         if isinstance(op, UnaryOp):
-#             return op.precedence, 1
-#         elif isinstance(op, BinaryOp):
-#             return op.precedence, 2
-#         elif isinstance(op, TrinaryOp):
-#             return op.precedence, 3
-# 
-#     with Parser() as expr:
-#         retval = (string(r'(') >> spaces >> expr << spaces << string(r')')) | token
-# 
-#         dict(groupby(ops, key=key)).items()
-
+sstrings = lambda const: spaces >> string(const) << spaces
 
 eof = string(EOF)
+
+
+def lassoic(op: BinaryOp, token: Parser) -> Parser:
+    o = sstrings(op.operator)
+    opt = pure(lambda a: lambda b: op(a, b))
+    with Parser() as expr:
+        sub = opt + token + (o >> token)
+        expr.define(opt + sub + (o >> expr) | sub | token)
+        return expr
+
+
+def rassoic(op: BinaryOp, token: Parser) -> Parser:
+    o = sstrings(op.operator)
+    opt = pure(lambda a: lambda b: op(a, b))
+    with Parser() as expr:
+        sub = opt + (token << o) + expr
+        expr.define(opt + (token << o) + sub | sub | token)
+        return expr
+
+
+def infix(op: BinaryOp, token: Parser) -> Parser:
+    return [lassoic, rassoic][op.associate](op, token)
+
+
+def paraphrase(l: str, parser: Parser, r: str) -> Parser:
+    return string(l) >> spaces >> parser << spaces << string(r)
+
+
+if __name__ == '__main__':
+    pass

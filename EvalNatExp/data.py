@@ -3,13 +3,19 @@ from bases.mixins import Token, BinaryOp
 
 
 class Exp(object):
-    pass
+    @property
+    def value(self) -> Nat:
+        raise NotImplementedError
 
 
 class ExpNat(Exp, Token):
     def __init__(self, a: Nat):
         assert isinstance(a, Nat), type(a)
         self.a = a
+
+    @property
+    def value(self) -> Nat:
+        return self.a
 
 
 class ExpPlus(Exp, BinaryOp):
@@ -23,6 +29,10 @@ class ExpPlus(Exp, BinaryOp):
         self.a = a
         self.b = b
 
+    @property
+    def value(self) -> Nat:
+        return self.a.value + self.b.value
+
 
 class ExpTimes(Exp, BinaryOp):
     operator = '*'
@@ -34,6 +44,10 @@ class ExpTimes(Exp, BinaryOp):
         assert isinstance(b, Exp), type(b)
         self.a = a
         self.b = b
+
+    @property
+    def value(self) -> Nat:
+        return self.a.value * self.b.value
 
 
 if __name__ == '__main__':

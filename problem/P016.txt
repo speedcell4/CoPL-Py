@@ -1,0 +1,1 @@
+S(S(Z)) + Z evalto S(S(Z))
