@@ -57,3 +57,7 @@ class Solver(object):
         if util.DEBUG:
             print('ast: {}'.format(ast))
         return self.system(ast)
+
+
+class DeductionError(Exception):
+    pass

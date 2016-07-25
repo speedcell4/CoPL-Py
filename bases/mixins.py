@@ -1,6 +1,3 @@
-from typing import Any
-
-
 class BaseToken(object):
     def paraphrase(self, parent: 'BaseToken', index: int) -> str:
         raise NotImplementedError
