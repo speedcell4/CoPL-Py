@@ -1,6 +1,6 @@
 from bases.derivation import Solver
 
-from Nat.miao import assertion
+from Nat.parser import assertion
 from Nat.rule import nat
 from bases.util import generate_unittest
 

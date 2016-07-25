@@ -1,6 +1,6 @@
 from EvalNatExp.data import ExpNat, ExpPlus, ExpTimes
 from EvalNatExp.rule import EvalTo
-from Nat.miao import nat
+from Nat.parser import nat
 from bases.parser import Parser, pure, sstrings, bracket, infix
 
 with Parser() as exp:
