@@ -1,12 +1,12 @@
-from Nat import Nat
+import logging
+
 from CompareNat import CompareNat1
 from CompareNat import CompareNat2
 from CompareNat import CompareNat3
 from EvalNatExp import EvalNatExp
+from Nat import Nat
 from ReduceNatExp import ReduceNatExp
-from bases.util import load_problem, dump_answer
-
-import logging
+from bases.util import load_problem
 
 logging.basicConfig(
     format=r'[%(levelname)s]%(asctime)s: %(message)s',
@@ -24,4 +24,4 @@ systems = {
 }
 
 if __name__ == '__main__':
-    dump_answer(ReduceNatExp(load_problem(21)), 21)
+    print(load_problem(21))

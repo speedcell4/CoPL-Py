@@ -1,6 +1,6 @@
 from Nat.data import Nat
-from bases.mixins import Token, BinaryOp
 from bases.derivation import DeductionError
+from bases.mixins import Token, BinaryOp
 from bases.util import type_checking
 
 
@@ -24,7 +24,6 @@ class ExpNat(Exp, Token):
     def __init__(self, a: Nat):
         self.a = a
 
-    @type_checking
     @type_checking
     def __eq__(self, other: Exp) -> bool:
         if isinstance(other, ExpNat):

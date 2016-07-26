@@ -1,7 +1,7 @@
+import logging
 from typing import Tuple, Any, Callable, Union
 
 from bases.mixins import BinaryOp
-from bases.util import DEBUG
 
 EOF = '<EOF>'
 
@@ -25,8 +25,7 @@ class Parser(object):
         self.fn = parser.fn
 
     def run(self, raw: str) -> Any:
-        if DEBUG:
-            print(r'raw: {}'.format(raw))
+        logging.debug(r'raw: {}'.format(raw))
         return self(raw)[1]
 
     def __call__(self, raw: str) -> Tuple[str, Any]:
