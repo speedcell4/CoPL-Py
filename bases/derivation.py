@@ -1,8 +1,7 @@
+import logging
 from typing import List
 
 from bases.parser import Parser, EOF, eof
-
-from bases import util
 
 
 class Assertion(object):
@@ -33,10 +32,10 @@ class System(object):
             return ' ' * n * 2
 
         for rule in self.rules:
-            if util.DEBUG:
-                print('rule: {}, assertion: {}'.format(rule, assertion))
+            logging.debug('try {} on {}'.format(rule, assertion))
             try:
                 subs = rule(assertion)
+                logging.debug('get {} by using {}'.format(subs, rule))
                 if subs is None:
                     continue
                 else:
@@ -54,8 +53,7 @@ class Solver(object):
 
     def __call__(self, raw: str) -> str:
         ast = self.parser.run(raw + EOF)
-        if util.DEBUG:
-            print('ast: {}'.format(ast))
+        logging.debug('parsing: {}'.format(ast))
         return self.system(ast)
 
 

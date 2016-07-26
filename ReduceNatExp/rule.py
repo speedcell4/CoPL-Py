@@ -3,6 +3,7 @@ from typing import List
 from EvalNatExp.rule import PlusIs, TimesIs
 from Nat.rule import PZero, PSucc, TZero, TSucc
 from bases.derivation import Assertion, Rule, System, DeductionError
+from bases.util import type_checking
 
 
 class Reduce(Assertion):
@@ -27,8 +28,8 @@ class ReduceD(Reduce):
 class RPlus(Rule):
     name = r'R-Plus'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, Reduce1)
+    @type_checking
+    def __call__(self, assertion: Reduce1) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpPlus) and isinstance(b, ExpNat):
             n1, n2 = a.a, a.b
@@ -38,8 +39,8 @@ class RPlus(Rule):
 class RTimes(Rule):
     name = r'R-Times'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, Reduce1)
+    @type_checking
+    def __call__(self, assertion: Reduce1) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpTimes) and isinstance(b, ExpNat):
             n1, n2 = a.a, a.b
@@ -49,8 +50,8 @@ class RTimes(Rule):
 class RPlusL(Rule):
     name = r'R-PlusL'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, Reduce1)
+    @type_checking
+    def __call__(self, assertion: Reduce1) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpPlus) and isinstance(b, ExpPlus):
             e1, e2 = a.a, a.b
@@ -62,8 +63,8 @@ class RPlusL(Rule):
 class RPlusR(Rule):
     name = r'R-PlusR'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, Reduce1)
+    @type_checking
+    def __call__(self, assertion: Reduce1) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpPlus) and isinstance(b, ExpPlus):
             e1, e2 = a.a, a.b
@@ -75,8 +76,8 @@ class RPlusR(Rule):
 class RTimesL(Rule):
     name = r'R-TimesL'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, Reduce1)
+    @type_checking
+    def __call__(self, assertion: Reduce1) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpTimes) and isinstance(b, ExpTimes):
             e1, e2 = a.a, a.b
@@ -88,8 +89,8 @@ class RTimesL(Rule):
 class RTimesR(Rule):
     name = r'R-TimesR'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, Reduce1)
+    @type_checking
+    def __call__(self, assertion: Reduce1) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpTimes) and isinstance(b, ExpTimes):
             e1, e2 = a.a, a.b
@@ -101,8 +102,8 @@ class RTimesR(Rule):
 class DRPlus(Rule):
     name = r'DR-Plus'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, ReduceD)
+    @type_checking
+    def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpPlus) and isinstance(b, ExpNat):
             n1, n2, n3 = a.a, a.b, b.value
@@ -112,8 +113,8 @@ class DRPlus(Rule):
 class DRTimes(Rule):
     name = r'DR-Times'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, ReduceD)
+    @type_checking
+    def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpTimes) and isinstance(b, ExpNat):
             n1, n2, n3 = a.a, a.b, b.value
@@ -123,8 +124,8 @@ class DRTimes(Rule):
 class DRPlusL(Rule):
     name = r'DR-PlusL'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, ReduceD)
+    @type_checking
+    def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpPlus) and isinstance(b, ExpPlus):
             e1, e2 = a.a, a.b
@@ -136,8 +137,8 @@ class DRPlusL(Rule):
 class DRPlusR(Rule):
     name = r'DR-PlusR'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, ReduceD)
+    @type_checking
+    def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpPlus) and isinstance(b, ExpPlus):
             e1, e2 = a.a, a.b
@@ -149,8 +150,8 @@ class DRPlusR(Rule):
 class DRTimesL(Rule):
     name = r'DR-TimesL'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, ReduceD)
+    @type_checking
+    def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpTimes) and isinstance(b, ExpTimes):
             e1, e2 = a.a, a.b
@@ -162,8 +163,8 @@ class DRTimesL(Rule):
 class DRTimesR(Rule):
     name = r'DR-TimesR'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, ReduceD)
+    @type_checking
+    def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpTimes) and isinstance(b, ExpTimes):
             e1, e2 = a.a, a.b
@@ -175,8 +176,8 @@ class DRTimesR(Rule):
 class MRZero(Rule):
     name = r'MR-Zero'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, Reduce0)
+    @type_checking
+    def __call__(self, assertion: Reduce0) -> List[Assertion]:
         a, b = assertion.args
         if a == b:
             return []
@@ -185,8 +186,8 @@ class MRZero(Rule):
 class MRMulti(Rule):
     name = r'MR-Multi'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, Reduce0)
+    @type_checking
+    def __call__(self, assertion: Reduce0) -> List[Assertion]:
         a, b = assertion.args
         if a != b:
             c = a.one_step(b)
@@ -196,8 +197,8 @@ class MRMulti(Rule):
 class MROne(Rule):
     name = r'MR-One'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, Reduce0)
+    @type_checking
+    def __call__(self, assertion: Reduce0) -> List[Assertion]:
         a, b = assertion.args
         return [Reduce1(a, b)]
 

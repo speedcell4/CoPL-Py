@@ -6,4 +6,4 @@ from bases.util import load_problem, dump_answer
 ReduceNatExp = Solver(assertion, reduce_nat_exp)
 
 if __name__ == '__main__':
-    print(ReduceNatExp(load_problem(21)))
+    pass

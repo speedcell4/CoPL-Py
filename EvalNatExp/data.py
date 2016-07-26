@@ -1,35 +1,43 @@
 from Nat.data import Nat
 from bases.mixins import Token, BinaryOp
 from bases.derivation import DeductionError
+from bases.util import type_checking
 
 
 class Exp(object):
+    @type_checking
     def __eq__(self, other: 'Exp') -> bool:
         raise NotImplementedError
 
     @property
+    @type_checking
     def value(self) -> Nat:
         raise NotImplementedError
 
+    @type_checking
     def one_step(self, other: 'Exp') -> 'Exp':
         raise NotImplementedError
 
 
 class ExpNat(Exp, Token):
+    @type_checking
     def __init__(self, a: Nat):
-        assert isinstance(a, Nat), type(a)
         self.a = a
 
-    def __eq__(self, other: 'Exp') -> bool:
+    @type_checking
+    @type_checking
+    def __eq__(self, other: Exp) -> bool:
         if isinstance(other, ExpNat):
             return self.a == other.a
         else:
             return False
 
     @property
+    @type_checking
     def value(self) -> Nat:
         return self.a
 
+    @type_checking
     def one_step(self, other: 'Exp') -> 'Exp':
         raise DeductionError
 
@@ -39,22 +47,24 @@ class ExpPlus(Exp, BinaryOp):
     associate = 0
     precedence = 1
 
+    @type_checking
     def __eq__(self, other: 'Exp') -> bool:
         if isinstance(other, ExpPlus):
             return self.a == other.a and self.b == other.b
         else:
             return False
 
+    @type_checking
     def __init__(self, a: Exp, b: Exp):
-        assert isinstance(a, Exp), type(a)
-        assert isinstance(b, Exp), type(b)
         self.a = a
         self.b = b
 
     @property
+    @type_checking
     def value(self) -> Nat:
         return self.a.value + self.b.value
 
+    @type_checking
     def one_step(self, other: 'Exp') -> 'Exp':
         if isinstance(other, ExpNat):
             return self.a.value + self.b.value
@@ -79,12 +89,14 @@ class ExpTimes(Exp, BinaryOp):
     associate = 0
     precedence = 2
 
+    @type_checking
     def __eq__(self, other: 'Exp') -> bool:
         if isinstance(other, ExpTimes):
             return self.a == other.a and self.b == other.b
         else:
             return False
 
+    @type_checking
     def __init__(self, a: Exp, b: Exp):
         assert isinstance(a, Exp), type(a)
         assert isinstance(b, Exp), type(b)
@@ -92,9 +104,11 @@ class ExpTimes(Exp, BinaryOp):
         self.b = b
 
     @property
+    @type_checking
     def value(self) -> Nat:
         return self.a.value * self.b.value
 
+    @type_checking
     def one_step(self, other: 'Exp') -> 'Exp':
         if isinstance(other, ExpNat):
             return self.a.value * self.b.value

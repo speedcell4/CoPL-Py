@@ -4,31 +4,32 @@ from EvalNatExp.data import Exp, ExpNat, ExpPlus, ExpTimes
 from bases.derivation import Assertion, Rule, System
 from typing import List
 
+from bases.util import type_checking
+
 
 class EvalTo(Assertion):
     template = r'{} evalto {}'
 
-    def __init__(self, exp: 'Exp', nat: 'Nat'):
-        assert isinstance(exp, Exp)
-        assert isinstance(nat, Nat)
+    @type_checking
+    def __init__(self, exp: Exp, nat: Nat):
         self.args = (exp, nat)
 
 
 class EConst(Rule):
     name = r'E-Const'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, EvalTo)
+    @type_checking
+    def __call__(self, assertion: EvalTo) -> List[Assertion]:
         e, n = assertion.args
-        if isinstance(e, ExpNat):
+        if isinstance(e, ExpNat) and e.value == n:
             return []
 
 
 class EPlus(Rule):
     name = r'E-Plus'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, EvalTo)
+    @type_checking
+    def __call__(self, assertion: EvalTo) -> List[Assertion]:
         e, n = assertion.args
         if isinstance(e, ExpPlus):
             e1, e2 = e.a, e.b
@@ -39,8 +40,8 @@ class EPlus(Rule):
 class ETimes(Rule):
     name = r'E-Times'
 
-    def __call__(self, assertion: Assertion) -> List[Assertion]:
-        assert isinstance(assertion, EvalTo)
+    @type_checking
+    def __call__(self, assertion: EvalTo) -> List[Assertion]:
         e, n = assertion.args
         if isinstance(e, ExpTimes):
             e1, e2 = e.a, e.b
