@@ -2,6 +2,7 @@ import logging
 from typing import Tuple, Any, Callable, Union
 
 from bases.mixins import BinaryOp
+from bases.util import type_checking
 
 EOF = '<EOF>'
 
@@ -21,21 +22,20 @@ class Parser(object):
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
-    def define(self, parser: 'Parser') -> None:
+    @type_checking
+    def define(self, parser: 'Parser'):
         self.fn = parser.fn
 
-    def run(self, raw: str) -> Any:
+    @type_checking
+    def run(self, raw: str):
         logging.debug(r'raw: {}'.format(raw))
         return self(raw)[1]
 
     def __call__(self, raw: str) -> Tuple[str, Any]:
-        assert isinstance(raw, str), r'raw should be str type instead of {}'.format(type(raw))
-
         return self.fn(raw)
 
+    @type_checking
     def __add__(self, other: 'Parser') -> 'Parser':
-        assert isinstance(other, Parser), '{} {}'.format(Parser, type(other))
-
         def wrapper(raw: str) -> Tuple[str, Any]:
             try:
                 raw1, ans1 = self(raw)
@@ -46,17 +46,15 @@ class Parser(object):
 
         return Parser(wrapper)
 
+    @type_checking
     def __or__(self, other: 'Parser') -> 'Parser':
-        assert isinstance(other, Parser)
-
         def wrapper(raw: str) -> Tuple[str, Any]:
             return self(raw) or other(raw)
 
         return Parser(wrapper)
 
+    @type_checking
     def __lshift__(self, other: 'Parser') -> 'Parser':
-        assert isinstance(other, Parser)
-
         def wrapper(raw: str) -> Tuple[str, Any]:
             try:
                 raw1, ans1 = self(raw)
@@ -67,9 +65,8 @@ class Parser(object):
 
         return Parser(wrapper)
 
+    @type_checking
     def __rshift__(self, other: 'Parser') -> 'Parser':
-        assert isinstance(other, Parser)
-
         def wrapper(raw: str) -> Tuple[str, Any]:
             try:
                 raw1, ans1 = self(raw)
@@ -116,6 +113,7 @@ digits = many(digit)
 alphas = many(alpha)
 
 
+@type_checking
 def regex(pattern: str) -> Parser:
     import re
     pattern = re.compile(pattern if pattern.startswith(r'^') else r'^' + pattern)
@@ -129,6 +127,7 @@ def regex(pattern: str) -> Parser:
     return wrapper
 
 
+@type_checking
 def string(const: str) -> Parser:
     assert isinstance(const, str)
 
@@ -145,6 +144,7 @@ sstrings = lambda const: spaces >> string(const) << spaces
 eof = string(EOF)
 
 
+@type_checking
 def chainl(op: type(BinaryOp), token: Parser) -> Parser:
     o = sstrings(op.operator)
     opt = pure(lambda a: lambda b: op(a, b))
@@ -154,6 +154,7 @@ def chainl(op: type(BinaryOp), token: Parser) -> Parser:
         return expr
 
 
+@type_checking
 def chainr(op: type(BinaryOp), token: Parser) -> Parser:
     o = sstrings(op.operator)
     opt = pure(lambda a: lambda b: op(a, b))
@@ -163,7 +164,8 @@ def chainr(op: type(BinaryOp), token: Parser) -> Parser:
         return expr
 
 
-def infix(op: BinaryOp, token: Parser) -> Parser:
+@type_checking
+def infix(op: type(BinaryOp), token: Parser) -> Parser:
     ops = [chainl, chainr]
     assert 0 <= op.associate < len(ops)
     return ops[op.associate](op, token)
