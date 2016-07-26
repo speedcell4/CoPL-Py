@@ -5,4 +5,4 @@ from bases.derivation import Solver
 Nat = Solver(assertion, nat)
 
 if __name__ == '__main__':
-    pass
+    print(Nat(r'S(Z) times S(Z) is S(S(Z))'))

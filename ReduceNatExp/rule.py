@@ -33,8 +33,6 @@ class RPlus(Rule):
     @type_checking
     def __call__(self, assertion: Reduce1) -> List[Assertion]:
         a, b = assertion.args
-        logging.info(r'RPlus - a: {}, b: {}'.format(a, b))
-        logging.info(r'a: {} - {}, b: {} - {}'.format(type(a), isinstance(a, ExpPlus), type(b), isinstance(b, ExpNat)))
         if isinstance(a, ExpPlus) and isinstance(b, ExpNat):
             n1, n2 = a.a, a.b
             if isinstance(n1, ExpNat) and isinstance(n2, ExpNat):
@@ -186,8 +184,8 @@ class MRZero(Rule):
 
     @type_checking
     def __call__(self, assertion: Reduce0) -> List[Assertion]:
-        a, b = assertion.args
-        if a == b:
+        e, e_ = assertion.args
+        if e == e_:
             return []
 
 
@@ -196,10 +194,11 @@ class MRMulti(Rule):
 
     @type_checking
     def __call__(self, assertion: Reduce0) -> List[Assertion]:
-        a, b = assertion.args
-        if a != b:
-            c = a.one_step(b)
-            return [Reduce0(a, c), Reduce0(c, b)]
+        e, e__ = assertion.args
+        if e != e__:
+            e_ = e.one_step(e__)
+            logging.debug('MR-Multi: {} => {} => {}'.format(e, e_, e__))
+            return [Reduce0(e, e_), Reduce0(e_, e__)]
 
 
 class MROne(Rule):
@@ -207,11 +206,11 @@ class MROne(Rule):
 
     @type_checking
     def __call__(self, assertion: Reduce0) -> List[Assertion]:
-        a, b = assertion.args
-        logging.debug(r'MROne - a: {}, b: {} => {}'.format(a, b, Reduce1(a, b)))
-        return [Reduce1(a, b)]
+        e, e_ = assertion.args
+        if e != e_ and e.one_step(e_) == e_:
+            return [Reduce1(e, e_)]
 
 
 reduce_nat_exp = System([RPlus(), RTimes(), RPlusL(), RPlusR(), RTimesL(), RTimesR(), DRPlus(), DRTimes(),
-                         DRPlusL(), DRPlusR(), DRTimesL(), DRTimesR(), MRZero(), MRMulti(), MROne(),
+                         DRPlusL(), DRPlusR(), DRTimesL(), DRTimesR(), MRZero(), MROne(), MRMulti(),
                          PZero(), PSucc(), TZero(), TSucc()])

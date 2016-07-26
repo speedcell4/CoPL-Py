@@ -1,3 +1,5 @@
+import logging
+
 from Nat.data import Nat
 from bases.derivation import DeductionError
 from bases.mixins import Token, BinaryOp
@@ -65,20 +67,28 @@ class ExpPlus(Exp, BinaryOp):
 
     @type_checking
     def one_step(self, other: 'Exp') -> 'Exp':
-        if isinstance(other, ExpNat):
-            return self.a.value + self.b.value
+        logging.debug('one step: {} => {}'.format(self, other))
+        if self == other:
+            raise DeductionError
         elif isinstance(other, ExpPlus):
-            try:
-                a = self.a.one_step(other.a)
-            except DeductionError:
-                a = self.a
-
-            try:
-                b = self.b.one_step(other.b)
-            except DeductionError:
-                b = self.b
-
-            return ExpPlus(a, b)
+            if self.a != other.a:
+                logging.debug(r'ExpPlus, a: {} + {}'.format(self.a.one_step(other.a), self.b))
+                return ExpPlus(self.a.one_step(other.a), self.b)
+            if self.b != other.b:
+                logging.debug(r'ExpPlus, b: {} + {}'.format(self.a, self.b.one_step(other.b)))
+                return ExpPlus(self.a, self.b.one_step(other.b))
+            raise DeductionError
+        elif isinstance(other, ExpTimes):
+            raise DeductionError
+        elif isinstance(other, ExpNat):
+            if not isinstance(self.a, ExpNat):
+                logging.debug(r'ExpNat, a: {} + {}'.format(self.a.one_step(ExpNat(self.a.value)), self.b))
+                return ExpPlus(self.a.one_step(ExpNat(self.a.value)), self.b)
+            if not isinstance(self.b, ExpNat):
+                logging.debug(r'ExpNat, b: {} + {}'.format(self.a, self.b.one_step(ExpNat(self.b.value))))
+                return ExpPlus(self.a, self.b.one_step(ExpNat(self.b.value)))
+            logging.debug(r'ExpNat: {}'.format(ExpNat(self.a.value + self.b.value)))
+            return ExpNat(self.a.value + self.b.value)
         else:
             raise DeductionError
 
@@ -109,20 +119,28 @@ class ExpTimes(Exp, BinaryOp):
 
     @type_checking
     def one_step(self, other: 'Exp') -> 'Exp':
-        if isinstance(other, ExpNat):
-            return self.a.value * self.b.value
+        logging.debug('one step: {} => {}'.format(self, other))
+        if self == other:
+            raise DeductionError
         elif isinstance(other, ExpTimes):
-            try:
-                a = self.a.one_step(other.a)
-            except DeductionError:
-                a = self.a
-
-            try:
-                b = self.b.one_step(other.b)
-            except DeductionError:
-                b = self.b
-
-            return ExpTimes(a, b)
+            if self.a != other.a:
+                logging.debug(r'ExpTimes, a: {} * {}'.format(self.a.one_step(other.a), self.b))
+                return ExpTimes(self.a.one_step(other.a), self.b)
+            if self.b != other.b:
+                logging.debug(r'ExpTimes, b: {} * {}'.format(self.a, self.b.one_step(other.b)))
+                return ExpTimes(self.a, self.b.one_step(other.b))
+            raise DeductionError
+        elif isinstance(other, ExpPlus):
+            raise DeductionError
+        elif isinstance(other, ExpNat):
+            if not isinstance(self.a, ExpNat):
+                logging.debug(r'ExpNat, a: {} * {}'.format(self.a.one_step(ExpNat(self.a.value)), self.b))
+                return ExpTimes(self.a.one_step(ExpNat(self.a.value)), self.b)
+            if not isinstance(self.b, ExpNat):
+                logging.debug(r'ExpNat, b: {} * {}'.format(self.a, self.b.one_step(ExpNat(self.b.value))))
+                return ExpTimes(self.a, self.b.one_step(ExpNat(self.b.value)))
+            logging.debug(r'ExpNat: {}'.format(ExpNat(self.a.value + self.b.value)))
+            return ExpNat(self.a.value * self.b.value)
         else:
             raise DeductionError
 

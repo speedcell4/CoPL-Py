@@ -28,14 +28,14 @@ class System(object):
         self.rules = rules
 
     def __call__(self, assertion: Assertion, depth=0) -> str:
-        def indent(n):
-            return ' ' * n * 2
+        def indent(n, char=r' '):
+            return char * n * 2
 
         for rule in self.rules:
-            logging.debug('try {} on {}'.format(rule, assertion))
             try:
+                logging.debug(r'{}try {} by using {}'.format(indent(depth), assertion, rule))
                 subs = rule(assertion)
-                logging.debug('get {} by using {}'.format(subs, rule))
+                logging.debug(r'{}get {} by using {}'.format(indent(depth), subs, rule))
                 if subs is None:
                     continue
                 else:
