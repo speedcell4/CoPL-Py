@@ -6,7 +6,7 @@ from CompareNat import CompareNat3
 from EvalNatExp import EvalNatExp
 from Nat import Nat
 from ReduceNatExp import ReduceNatExp
-from bases.util import load_problem
+from bases.util import load_problem, dump_answer
 
 logging.basicConfig(
     format=r'[%(levelname)s]%(asctime)s: %(message)s',
@@ -24,4 +24,5 @@ systems = {
 }
 
 if __name__ == '__main__':
-    print(load_problem(21))
+    dump_answer(ReduceNatExp(load_problem(24)), 24)
+    logging.info('finish')

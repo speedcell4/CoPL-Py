@@ -40,8 +40,8 @@ class System(object):
                     continue
                 else:
                     head = indent(depth) + '{} by {} {{\n'.format(assertion, rule.name)
-                    mild = ';\n'.join(self(sub, depth + 1) for sub in subs)
-                    return head + mild + '\n' + indent(depth) + '}'
+                    middle = ';\n'.join(self(sub, depth + 1) for sub in subs)
+                    return head + middle + '\n' + indent(depth) + '}'
             except AssertionError as _:
                 pass
 

@@ -1,8 +1,10 @@
-from ReduceNatExp.data import Nat, Exp, ExpNat, ExpPlus, ExpTimes
+import logging
 from typing import List
+
 from EvalNatExp.rule import PlusIs, TimesIs
 from Nat.rule import PZero, PSucc, TZero, TSucc
-from bases.derivation import Assertion, Rule, System, DeductionError
+from ReduceNatExp.data import Exp, ExpNat, ExpPlus, ExpTimes
+from bases.derivation import Assertion, Rule, System
 from bases.util import type_checking
 
 
@@ -31,9 +33,12 @@ class RPlus(Rule):
     @type_checking
     def __call__(self, assertion: Reduce1) -> List[Assertion]:
         a, b = assertion.args
+        logging.info(r'RPlus - a: {}, b: {}'.format(a, b))
+        logging.info(r'a: {} - {}, b: {} - {}'.format(type(a), isinstance(a, ExpPlus), type(b), isinstance(b, ExpNat)))
         if isinstance(a, ExpPlus) and isinstance(b, ExpNat):
             n1, n2 = a.a, a.b
-            return [PlusIs(n1, n2, b.value)]
+            if isinstance(n1, ExpNat) and isinstance(n2, ExpNat):
+                return [PlusIs(n1.value, n2.value, b.value)]
 
 
 class RTimes(Rule):
@@ -44,7 +49,8 @@ class RTimes(Rule):
         a, b = assertion.args
         if isinstance(a, ExpTimes) and isinstance(b, ExpNat):
             n1, n2 = a.a, a.b
-            return [TimesIs(n1, n2, b.value)]
+            if isinstance(n1, ExpNat) and isinstance(n2, ExpNat):
+                return [TimesIs(n1.value, n2.value, b.value)]
 
 
 class RPlusL(Rule):
@@ -106,8 +112,9 @@ class DRPlus(Rule):
     def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpPlus) and isinstance(b, ExpNat):
-            n1, n2, n3 = a.a, a.b, b.value
-            return [PlusIs(n1, n2, n3)]
+            n1, n2 = a.a, a.b
+            if isinstance(n1, ExpNat) and isinstance(n2, ExpNat):
+                return [PlusIs(n1.value, n2.value, b.value)]
 
 
 class DRTimes(Rule):
@@ -117,8 +124,9 @@ class DRTimes(Rule):
     def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpTimes) and isinstance(b, ExpNat):
-            n1, n2, n3 = a.a, a.b, b.value
-            return [TimesIs(n1, n2, n3)]
+            n1, n2 = a.a, a.b
+            if isinstance(n1, ExpNat) and isinstance(n2, ExpNat):
+                return [TimesIs(n1.value, n2.value, b.value)]
 
 
 class DRPlusL(Rule):
@@ -141,9 +149,9 @@ class DRPlusR(Rule):
     def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpPlus) and isinstance(b, ExpPlus):
-            e1, e2 = a.a, a.b
-            e1_, e2_ = b.a, b.b
-            if e1 == e1_:
+            n1, e2 = a.a, a.b
+            n1_, e2_ = b.a, b.b
+            if isinstance(n1, ExpNat) and isinstance(n1_, ExpNat) and n1 == n1_:
                 return [ReduceD(e2, e2_)]
 
 
@@ -167,9 +175,9 @@ class DRTimesR(Rule):
     def __call__(self, assertion: ReduceD) -> List[Assertion]:
         a, b = assertion.args
         if isinstance(a, ExpTimes) and isinstance(b, ExpTimes):
-            e1, e2 = a.a, a.b
-            e1_, e2_ = b.a, b.b
-            if e1 == e1_:
+            n1, e2 = a.a, a.b
+            n1_, e2_ = b.a, b.b
+            if isinstance(n1, ExpNat) and isinstance(n1_, ExpNat) and n1 == n1_:
                 return [ReduceD(e2, e2_)]
 
 
@@ -200,6 +208,7 @@ class MROne(Rule):
     @type_checking
     def __call__(self, assertion: Reduce0) -> List[Assertion]:
         a, b = assertion.args
+        logging.debug(r'MROne - a: {}, b: {} => {}'.format(a, b, Reduce1(a, b)))
         return [Reduce1(a, b)]
 
 
