@@ -5,8 +5,8 @@ from bases.parser import Parser, pure, sstrings, bracket, infix
 
 with Parser() as exp:
     exp1 = bracket(r'(', exp, r')') | (pure(ExpNat) + nat)
-    exp2 = infix(ExpTimes, exp1)
-    exp3 = infix(ExpPlus, exp2)
+    exp2 = infix(exp1, ExpTimes)
+    exp3 = infix(exp2, ExpPlus)
     exp.define(exp3)
 
 with Parser() as assertion:

@@ -1,10 +1,8 @@
 import logging
+from functools import reduce
 from typing import Tuple, Any, Callable, Union
 
-from bases.mixins import BinaryOp
 from bases.util import type_checking
-
-EOF = '<EOF>'
 
 
 # TODO
@@ -141,34 +139,39 @@ def string(const: str) -> Parser:
 
 sstrings = lambda const: spaces >> string(const) << spaces
 
+EOF = '<EOF>'
 eof = string(EOF)
 
 
 @type_checking
-def chainl(op: type(BinaryOp), token: Parser) -> Parser:
-    o = sstrings(op.operator)
-    opt = pure(lambda a: lambda b: op(a, b))
+def chainl(token: Parser, *ops) -> Parser:
+    os = [sstrings(op.operator) for op in ops]
+    opts = [pure(lambda a: lambda b: op(a, b)) for op in ops]
     with Parser() as expr:
-        sub = opt + token + (o >> token)
-        expr.define(opt + sub + (o >> expr) | sub | token)
+        subs = [opt + token + (o >> token) for opt, o in zip(opts, os)]
+        deeps = [opt + sub + (o >> expr) for opt, o, sub in zip(opts, os, subs)]
+        expr.define(reduce(lambda a, b: a | b, deeps) | reduce(lambda a, b: a | b, subs) | token)
         return expr
 
 
 @type_checking
-def chainr(op: type(BinaryOp), token: Parser) -> Parser:
-    o = sstrings(op.operator)
-    opt = pure(lambda a: lambda b: op(a, b))
+def chainr(token: Parser, *ops) -> Parser:
+    os = [sstrings(op.operator) for op in ops]
+    opts = [pure(lambda a: lambda b: op(a, b)) for op in ops]
     with Parser() as expr:
-        sub = opt + (token << o) + expr
-        expr.define(opt + (token << o) + sub | sub | token)
+        subs = [opt + (token << o) + expr for opt, o in zip(opts, os)]
+        deeps = [opt + (token << o) + sub for opt, o, sub in zip(opts, os, subs)]
+        expr.define(reduce(lambda a, b: a | b, deeps) | reduce(lambda a, b: a | b, subs) | token)
         return expr
 
 
+# TODO how to write the type annotation of *args
 @type_checking
-def infix(op: type(BinaryOp), token: Parser) -> Parser:
-    ops = [chainl, chainr]
-    assert 0 <= op.associate < len(ops)
-    return ops[op.associate](op, token)
+def infix(token: Parser, *ops) -> Parser:
+    assert all(op.associate == ops[0].associate and op.precedence == ops[0].precedence for op in
+               ops), 'every op should have same precedence and associate'
+    ps = [chainl, chainr]
+    return ps[ops[0].associate](token, *ops)
 
 
 def bracket(l: Union[str, Parser], parser: Parser, r: Union[str, Parser]) -> Parser:
@@ -180,4 +183,4 @@ def bracket(l: Union[str, Parser], parser: Parser, r: Union[str, Parser]) -> Par
 if __name__ == '__main__':
     from ReduceNatExp.data import ExpPlus
 
-    infix(ExpPlus, Parser())
+    infix(Parser(), ExpPlus)
