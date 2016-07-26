@@ -1,10 +1,8 @@
 from typing import List
 
-from bases.derivation import Assertion, Rule, System
-
 from CompareNat.data import Nat, Z, S
+from bases.derivation import Assertion, Rule, System
 from bases.util import type_checking
-import logging
 
 
 class IsLessThan(Assertion):
