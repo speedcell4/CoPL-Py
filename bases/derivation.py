@@ -42,8 +42,10 @@ class System(object):
                     head = indent(depth) + '{} by {} {{\n'.format(assertion, rule.name)
                     middle = ';\n'.join(self(sub, depth + 1) for sub in subs)
                     return head + middle + '\n' + indent(depth) + '}'
-            except AssertionError as _:
+            except AssertionError:
                 pass
+            except Exception as error:
+                logging.error('{}'.format(error))
 
 
 class Solver(object):

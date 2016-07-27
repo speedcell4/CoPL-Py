@@ -4,16 +4,11 @@ class BaseToken(object):
 
 
 class Token(BaseToken):
-    a = None
-
-    def paraphrase(self, _: 'BaseToken', index: int = 0) -> str:
-        return r'{}'.format(self.__str__())
-
-    def __str__(self):
-        return r'{}'.format(self.a)
+    pass
 
 
 class Operator(BaseToken):
+    operator = None
     precedence = -1
 
     def paraphrase(self, parent: 'BaseToken', index: int) -> str:
@@ -25,7 +20,6 @@ class Operator(BaseToken):
 
 class UnaryOp(Operator):
     a = None
-    operator = None
 
     def paraphrase(self, parent: 'BaseToken', index: int) -> str:
         return r'{}'.format(self.__str__())
@@ -38,7 +32,6 @@ class UnaryOp(Operator):
 class BinaryOp(Operator):
     a = None
     b = None
-    operator = None
 
     associate = -1
 
@@ -73,3 +66,6 @@ class TrinaryOp(Operator):
 
     def paraphrase(self, parent: 'BaseToken', index: int) -> str:
         pass
+
+    def __str__(self):
+        return r'{} {} {} {} {} {}'.format(self.operator[0], self.a, self.operator[1], self.b, self.operator[2], self.c)
