@@ -15,14 +15,14 @@ def type_checking(fn):
         for vari, varname in enumerate(fn.__code__.co_varnames):
             argtype = fn.__annotations__.get(varname)
             if isinstance(argtype, type):
-                if vari < len(args):
+                if 0 <= vari < len(args):
                     assert isinstance(args[vari], argtype), \
                         type_error_info.format(varname, argtype.__name__, type(args[vari]).__name__)
-                elif varname in vari:
+                elif varname in kwargs:
                     assert isinstance(kwargs[varname], argtype), \
                         type_error_info.format(varname, argtype.__name__, type(kwargs[varname]).__name__)
                 else:
-                    raise TypeError('what is this?')
+                    raise TypeError('what is {}?'.format(varname))
         rval = fn(*args, **kwargs)
         rtype = fn.__annotations__.get('return')
         if isinstance(rtype, type):
@@ -61,3 +61,12 @@ def load_answer(index: int) -> str:
 def dump_answer(answer: str, index: int) -> None:
     with open(ANSWER.format(index), 'w') as writer:
         writer.write(answer.strip())
+
+
+if __name__ == '__main__':
+    @type_checking
+    def add(a: int, b: int) -> int:
+        return a + b
+
+
+    print(add('mi', b='miao'))
