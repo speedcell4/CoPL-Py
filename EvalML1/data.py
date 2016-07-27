@@ -82,6 +82,10 @@ class Exp(object):
 
 class ExpInt(Exp, Token):
     @type_checking
+    def __str__(self) -> str:
+        return r'{}'.format(self.i)
+
+    @type_checking
     def __init__(self, i: int):
         self.i = i
 
@@ -99,6 +103,13 @@ class ExpInt(Exp, Token):
 
 
 class ExpBool(Exp, Token):
+    @type_checking
+    def __str__(self) -> str:
+        if self.b:
+            return 'true'
+        else:
+            return 'false'
+
     @type_checking
     def __init__(self, b: bool):
         self.b = b
@@ -226,6 +237,8 @@ class ExpLt(Exp, BinaryOp):
 
 
 class ExpIf(Exp, TrinaryOp):
+    operator = ['if', 'then', 'else']
+
     @type_checking
     def __init__(self, a: Exp, b: Exp, c: Exp):
         self.a = a

@@ -4,7 +4,11 @@ class BaseToken(object):
 
 
 class Token(BaseToken):
-    pass
+    def __str__(self) -> str:
+        raise NotImplementedError
+
+    def paraphrase(self, parent: 'BaseToken', index: int) -> str:
+        return r'{}'.format(self)
 
 
 class Operator(BaseToken):
@@ -42,7 +46,7 @@ class BinaryOp(Operator):
             raise NotImplementedError
         elif isinstance(parent, BinaryOp):
             if parent.precedence == self.precedence:
-                if parent.associate == self.associate:
+                if parent.associate == self.associate == index:
                     return r'{}'.format(self.__str__())
                 else:
                     return r'({})'.format(self.__str__())

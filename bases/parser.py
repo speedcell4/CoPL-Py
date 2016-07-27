@@ -1,7 +1,9 @@
+import functools
+import itertools
 import logging
-from functools import reduce
 from typing import Tuple, Any, Callable, Union
 
+from bases.mixins import BinaryOp
 from bases.util import type_checking
 
 
@@ -47,7 +49,12 @@ class Parser(object):
     @type_checking
     def __or__(self, other: 'Parser') -> 'Parser':
         def wrapper(raw: str) -> Tuple[str, Any]:
-            return self(raw) or other(raw)
+            try:
+                raw1, ans1 = self(raw)
+                return raw1, ans1
+            except (TypeError, ValueError) as error:
+                logging.debug(r'or {}'.format(error))
+                return other(raw)
 
         return Parser(wrapper)
 
@@ -137,41 +144,53 @@ def string(const: str) -> Parser:
     return wrapper
 
 
-sstrings = lambda const: spaces >> string(const) << spaces
+stringl = lambda const: spaces >> string(const)
+stringr = lambda const: string(const) << spaces
+string2 = lambda const: spaces >> string(const) << spaces
 
 EOF = '<EOF>'
 eof = string(EOF)
 
 
 @type_checking
-def chainl(token: Parser, *ops) -> Parser:
-    os = [sstrings(op.operator) for op in ops]
-    opts = [pure(lambda a: lambda b: op(a, b)) for op in ops]
-    with Parser() as expr:
-        subs = [opt + token + (o >> token) for opt, o in zip(opts, os)]
-        deeps = [opt + sub + (o >> expr) for opt, o, sub in zip(opts, os, subs)]
-        expr.define(reduce(lambda a, b: a | b, deeps) | reduce(lambda a, b: a | b, subs) | token)
-        return expr
+def chainl(token: Parser, op: type(BinaryOp), expr: Parser) -> Parser:
+    o = string2(op.operator)
+    opt = pure(lambda a: lambda b: op(a, b))
+    with expr or Parser() as exp:
+        sub = opt + token + (o >> token)
+        exp.define(opt + sub + (o >> exp) | sub | token)
+        return exp
 
 
 @type_checking
-def chainr(token: Parser, *ops) -> Parser:
-    os = [sstrings(op.operator) for op in ops]
-    opts = [pure(lambda a: lambda b: op(a, b)) for op in ops]
-    with Parser() as expr:
-        subs = [opt + (token << o) + expr for opt, o in zip(opts, os)]
-        deeps = [opt + (token << o) + sub for opt, o, sub in zip(opts, os, subs)]
-        expr.define(reduce(lambda a, b: a | b, deeps) | reduce(lambda a, b: a | b, subs) | token)
-        return expr
+def chainr(token: Parser, op: type(BinaryOp), expr: Parser) -> Parser:
+    o = string2(op.operator)
+    opt = pure(lambda a: lambda b: op(a, b))
+    with expr or Parser() as exp:
+        sub = opt + (token << o) + exp
+        exp.define(opt + (token << o) + sub | sub | token)
+        return exp
 
 
-# TODO how to write the type annotation of *args
 @type_checking
-def infix(token: Parser, *ops) -> Parser:
-    assert all(op.associate == ops[0].associate and op.precedence == ops[0].precedence for op in
-               ops), 'every op should have same precedence and associate'
-    ps = [chainl, chainr]
-    return ps[ops[0].associate](token, *ops)
+def chain(token: Parser, op: type(BinaryOp), expr: Parser = None) -> Parser:
+    return [chainl, chainr][op.associate](token, op, expr)
+
+
+@type_checking
+def infixes(token: Parser, *ops: type(BinaryOp)) -> Parser:
+    key = lambda n: (n.precedence, n.associate)
+
+    with Parser() as exp:
+        terms = [bracket(r'(', exp, r')') | token]
+        for (precedence, associate), operators in itertools.groupby(sorted(ops, reverse=True, key=key), key=key):
+            operators = list(operators)
+            logging.debug(r'{}'.format(operators))
+            with Parser() as temp:
+                temp.define(functools.reduce(lambda a, b: a | b, [chain(terms[-1], op, temp) for op in operators]))
+                terms.append(temp)
+        exp.define(terms[-1])
+        return exp
 
 
 def bracket(l: Union[str, Parser], parser: Parser, r: Union[str, Parser]) -> Parser:
@@ -180,7 +199,13 @@ def bracket(l: Union[str, Parser], parser: Parser, r: Union[str, Parser]) -> Par
     return l >> spaces >> parser << spaces << r
 
 
-if __name__ == '__main__':
-    from ReduceNatExp.data import ExpPlus
+logging.basicConfig(
+    format=r'[%(levelname)s]%(asctime)s: %(message)s',
+    datefmt='%Y/%m/%d-%H:%M:%S',
+    level=logging.DEBUG,
+)
 
-    infix(Parser(), ExpPlus)
+if __name__ == '__main__':
+    from EvalML1.data import ExpPlus, ExpMinus, ExpTimes
+
+    exp = infixes(Parser(), ExpTimes, ExpPlus, ExpMinus)

@@ -22,6 +22,9 @@ class Exp(object):
 
 
 class ExpNat(Exp, Token):
+    def __str__(self) -> str:
+        return r'{}'.format(self.a)
+
     @type_checking
     def __init__(self, a: Nat):
         self.a = a
