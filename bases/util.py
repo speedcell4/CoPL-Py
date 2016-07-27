@@ -19,8 +19,8 @@ def type_checking(fn):
                     assert isinstance(args[vari], argtype), \
                         type_error_info.format(varname, argtype.__name__, type(args[vari]).__name__)
                 elif varname in vari:
-                    assert isinstance(args[varname], argtype), \
-                        type_error_info.format(varname, argtype.__name__, type(args[vari]).__name__)
+                    assert isinstance(kwargs[varname], argtype), \
+                        type_error_info.format(varname, argtype.__name__, type(kwargs[varname]).__name__)
                 else:
                     raise TypeError('what is this?')
         rval = fn(*args, **kwargs)
