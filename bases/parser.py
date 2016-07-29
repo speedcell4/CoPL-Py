@@ -1,6 +1,7 @@
 import functools
 import itertools
 import logging
+from operator import or_
 from typing import Tuple, Any, Callable, Union
 
 from bases.mixins import BinaryOp
@@ -53,7 +54,7 @@ class Parser(object):
                 raw1, ans1 = self(raw)
                 return raw1, ans1
             except (TypeError, ValueError) as error:
-                logging.debug(r'or {}'.format(error))
+                # logging.debug(r'or {}'.format(error))
                 return other(raw)
 
         return Parser(wrapper)
@@ -152,24 +153,36 @@ EOF = '<EOF>'
 eof = string(EOF)
 
 
-@type_checking
-def chainl(token: Parser, op: type(BinaryOp), expr: Parser) -> Parser:
-    o = string2(op.operator)
-    opt = pure(lambda a: lambda b: op(a, b))
-    with expr or Parser() as exp:
-        sub = opt + token + (o >> token)
-        exp.define(opt + sub + (o >> exp) | sub | token)
-        return exp
+def curry2(fn):
+    def para1(a):
+        def para2(b):
+            return fn(a, b)
+
+        return para2
+
+    return para1
 
 
 @type_checking
-def chainr(token: Parser, op: type(BinaryOp), expr: Parser) -> Parser:
-    o = string2(op.operator)
-    opt = pure(lambda a: lambda b: op(a, b))
-    with expr or Parser() as exp:
-        sub = opt + (token << o) + exp
-        exp.define(opt + (token << o) + sub | sub | token)
-        return exp
+def chainl(tokn: Parser, *ops: type(BinaryOp)) -> Parser:
+    assert all(o.precedence == ops[0].precedence and o.associate == ops[0].associate for o in ops)
+    with Parser() as expr:
+        subl = functools.reduce(
+            or_, [pure(curry2(o)) + tokn + (string2(o.operator) >> tokn) for o in ops]) | tokn
+        expr.define(functools.reduce(
+            or_, [pure(curry2(o)) + subl + (string2(o.operator) >> expr) for o in ops]) | subl)
+    return expr
+
+
+@type_checking
+def chainr(tokn: Parser, *ops: type(BinaryOp)) -> Parser:
+    assert all(o.precedence == ops[0].precedence and o.associate == ops[0].associate for o in ops)
+    with Parser() as expr:
+        subr = functools.reduce(
+            or_, [pure(curry2(o)) + (tokn << string2(o.operator)) + expr for o in ops]) | tokn
+        expr.define(functools.reduce(
+            or_, [pure(curry2(o)) + (tokn << string2(o.operator)) + subr for o in ops]) | subr)
+        return expr
 
 
 @type_checking
@@ -185,6 +198,7 @@ def infixes(token: Parser, *ops: type(BinaryOp)) -> Parser:
         terms = [bracket(r'(', exp, r')') | token]
         for (precedence, associate), operators in itertools.groupby(sorted(ops, reverse=True, key=key), key=key):
             operators = list(operators)
+            logging.info(r'{} {} => {}'.format(precedence, associate, operators))
             logging.debug(r'{}'.format(operators))
             with Parser() as temp:
                 temp.define(functools.reduce(lambda a, b: a | b, [chain(terms[-1], op, temp) for op in operators]))
@@ -206,6 +220,26 @@ logging.basicConfig(
 )
 
 if __name__ == '__main__':
-    from EvalML1.data import ExpPlus, ExpMinus, ExpTimes
+    class add(object):
+        def __init__(self, a, b):
+            self.a = a
+            self.b = b
 
-    exp = infixes(Parser(), ExpTimes, ExpPlus, ExpMinus)
+        def __str__(self):
+            return r'{} + {}'.format(self.a, self.b)
+
+
+    class sub(object):
+        def __init__(self, a, b):
+            self.a = a
+            self.b = b
+
+        def __str__(self):
+            return r'{} - {}'.format(self.a, self.b)
+
+
+    miaos = [lambda a: lambda b: o(a, b) for o in [add, sub]]
+
+    for a, b in zip(range(3), range(3)):
+        for miao in miaos:
+            print(miao(a, b))

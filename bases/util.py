@@ -64,9 +64,4 @@ def dump_answer(answer: str, index: int) -> None:
 
 
 if __name__ == '__main__':
-    @type_checking
-    def add(a: int, b: int) -> int:
-        return a + b
-
-
-    print(add('mi', b='miao'))
+    pass
