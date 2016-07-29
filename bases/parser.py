@@ -153,24 +153,32 @@ EOF = '<EOF>'
 eof = string(EOF)
 
 
+def curry1(fn):
+    def wrapper(a):
+        return fn(a)
+
+    return wrapper
+
+
 def curry2(fn):
-    def para1(a):
-        def para2(b):
+    def wrapper1(a):
+        def wrapper2(b):
             return fn(a, b)
 
-        return para2
+        return wrapper2
 
-    return para1
+    return wrapper1
 
 
 @type_checking
 def chainl(tokn: Parser, *ops: type(BinaryOp)) -> Parser:
     assert all(o.precedence == ops[0].precedence and o.associate == ops[0].associate for o in ops)
     with Parser() as expr:
-        subl = functools.reduce(
-            or_, [pure(curry2(o)) + tokn + (string2(o.operator) >> tokn) for o in ops]) | tokn
-        expr.define(functools.reduce(
-            or_, [pure(curry2(o)) + subl + (string2(o.operator) >> expr) for o in ops]) | subl)
+        with Parser() as rest:
+            expr.define(functools.reduce(
+                or_, [pure(curry2(o)) + rest + (string2(o.operator) >> tokn) for o in ops]) | tokn)
+            rest.define(functools.reduce(
+                or_, [pure(curry2(o)) + tokn + (string2(o.operator) >> rest) for o in ops]) | tokn)
     return expr
 
 
@@ -178,16 +186,17 @@ def chainl(tokn: Parser, *ops: type(BinaryOp)) -> Parser:
 def chainr(tokn: Parser, *ops: type(BinaryOp)) -> Parser:
     assert all(o.precedence == ops[0].precedence and o.associate == ops[0].associate for o in ops)
     with Parser() as expr:
-        subr = functools.reduce(
-            or_, [pure(curry2(o)) + (tokn << string2(o.operator)) + expr for o in ops]) | tokn
-        expr.define(functools.reduce(
-            or_, [pure(curry2(o)) + (tokn << string2(o.operator)) + subr for o in ops]) | subr)
+        with Parser() as rest:
+            expr.define(functools.reduce(
+                or_, [pure(curry2(o)) + (tokn << string2(o.operator)) + rest for o in ops]) | rest)
+            rest.define(functools.reduce(
+                or_, [pure(curry2(o)) + (tokn << string2(o.operator)) + expr for o in ops]) | tokn)
         return expr
 
 
 @type_checking
-def chain(token: Parser, op: type(BinaryOp), expr: Parser = None) -> Parser:
-    return [chainl, chainr][op.associate](token, op, expr)
+def chain(token: Parser, *ops: type(BinaryOp)) -> Parser:
+    return [chainl, chainr][ops[0].associate](token, *ops)
 
 
 @type_checking
@@ -196,13 +205,11 @@ def infixes(token: Parser, *ops: type(BinaryOp)) -> Parser:
 
     with Parser() as exp:
         terms = [bracket(r'(', exp, r')') | token]
-        for (precedence, associate), operators in itertools.groupby(sorted(ops, reverse=True, key=key), key=key):
-            operators = list(operators)
-            logging.info(r'{} {} => {}'.format(precedence, associate, operators))
-            logging.debug(r'{}'.format(operators))
-            with Parser() as temp:
-                temp.define(functools.reduce(lambda a, b: a | b, [chain(terms[-1], op, temp) for op in operators]))
-                terms.append(temp)
+        for (precedence, associate), ops in itertools.groupby(sorted(ops, reverse=True, key=key), key=key):
+            # ops = list(ops)
+            # logging.info(r'{} {} => {}'.format(precedence, associate, ops))
+            # logging.debug(r'{}'.format(ops))
+            terms.append(chain(terms[-1], *ops))
         exp.define(terms[-1])
         return exp
 

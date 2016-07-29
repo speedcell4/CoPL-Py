@@ -133,6 +133,9 @@ class ExpPlus(Exp, BinaryOp):
     associate = 0
     precedence = 2
 
+    def __str__(self):
+        return r'({} + {})'.format(self.a, self.b)
+
     @type_checking
     def __init__(self, a: Exp, b: Exp):
         self.a = a
