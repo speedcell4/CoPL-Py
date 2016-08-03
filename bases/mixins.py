@@ -1,14 +1,17 @@
+import logging
+
+
 class BaseToken(object):
     def paraphrase(self, parent: 'BaseToken', index: int) -> str:
         raise NotImplementedError
 
 
 class Token(BaseToken):
-    def __str__(self) -> str:
-        raise NotImplementedError
-
     def paraphrase(self, parent: 'BaseToken', index: int) -> str:
         return r'{}'.format(self)
+
+    def __str__(self) -> str:
+        raise NotImplementedError
 
 
 class Operator(BaseToken):
@@ -45,21 +48,18 @@ class BinaryOp(Operator):
         elif isinstance(parent, UnaryOp):
             raise NotImplementedError
         elif isinstance(parent, BinaryOp):
-            if parent.precedence == self.precedence:
-                if parent.associate == self.associate == index:
-                    return r'{}'.format(self.__str__())
-                else:
-                    return r'({})'.format(self.__str__())
-            elif parent.precedence < self.precedence:
-                return r'{}'.format(self.__str__())
-            else:
-                return r'({})'.format(self.__str__())
+            if self.precedence < parent.precedence:
+                if self.associate != index:
+                    return '(!{}!)'.format(self.__str__())
+            return '!{}!'.format(self.__str__())
         elif isinstance(parent, TrinaryOp):
             raise NotImplementedError
 
     def __str__(self):
         assert isinstance(self.a, BaseToken)
         assert isinstance(self.b, BaseToken)
+        # return '({} {} {})'.format(self.a, self.operator, self.b)
+        logging.debug(r'a: {}, b: {}'.format(self.a, self.b))
         return '{} {} {}'.format(self.a.paraphrase(self, 0), self.operator, self.b.paraphrase(self, 1))
 
 

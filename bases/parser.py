@@ -48,6 +48,30 @@ class Parser(object):
         return Parser(wrapper)
 
     @type_checking
+    def __sub__(self, other: 'Parser') -> 'Parser':
+        def wrapper(raw: str) -> Tuple[str, Any]:
+            try:
+                raw1, ans1 = self(raw)
+                raw2, ans2 = other(raw1)
+                return raw2, ans2(ans1)
+            except TypeError:
+                return None
+
+        return Parser(wrapper)
+
+    @type_checking
+    def __mul__(self, other: 'Parser') -> 'Parser':
+        def wrapper(raw: str) -> Tuple[str, Any]:
+            try:
+                raw1, ans1 = self(raw)
+                raw2, ans2 = other(raw1)
+                return ans2(ans1)(raw2)
+            except TypeError:
+                return None
+
+        return Parser(wrapper)
+
+    @type_checking
     def __or__(self, other: 'Parser') -> 'Parser':
         def wrapper(raw: str) -> Tuple[str, Any]:
             try:
@@ -154,10 +178,10 @@ eof = string(EOF)
 
 
 def curry1(fn):
-    def wrapper(a):
+    def wrapper1(a):
         return fn(a)
 
-    return wrapper
+    return wrapper1
 
 
 def curry2(fn):
@@ -170,27 +194,29 @@ def curry2(fn):
     return wrapper1
 
 
+def binary_op(op: BinaryOp) -> Parser:
+    return pure(curry2(op)) << string2(op.operator)
+
+
 @type_checking
-def chainl(tokn: Parser, *ops: type(BinaryOp)) -> Parser:
+def chainl(token: Parser, *ops: type(BinaryOp)) -> Parser:
     assert all(o.precedence == ops[0].precedence and o.associate == ops[0].associate for o in ops)
-    with Parser() as expr:
-        with Parser() as rest:
-            expr.define(functools.reduce(
-                or_, [pure(curry2(o)) + rest + (string2(o.operator) >> tokn) for o in ops]) | tokn)
-            rest.define(functools.reduce(
-                or_, [pure(curry2(o)) + tokn + (string2(o.operator) >> rest) for o in ops]) | tokn)
-    return expr
+
+    with Parser() as rest:
+        @type_checking
+        def rest(x) -> Parser:
+            return functools.reduce(
+                or_, [pure(x) - binary_op(o) + token for o in ops]) * pure(rest) | pure(x)
+
+        return token * pure(rest)
 
 
 @type_checking
 def chainr(tokn: Parser, *ops: type(BinaryOp)) -> Parser:
     assert all(o.precedence == ops[0].precedence and o.associate == ops[0].associate for o in ops)
     with Parser() as expr:
-        with Parser() as rest:
-            expr.define(functools.reduce(
-                or_, [pure(curry2(o)) + (tokn << string2(o.operator)) + rest for o in ops]) | rest)
-            rest.define(functools.reduce(
-                or_, [pure(curry2(o)) + (tokn << string2(o.operator)) + expr for o in ops]) | tokn)
+        expr.define(functools.reduce(
+            or_, [tokn - binary_op(o) + expr for o in ops]) | tokn)
         return expr
 
 

@@ -1,6 +1,6 @@
 import logging
 
-from EvalML1.data import ValueInt, ValueBool, ExpInt, ExpBool, ExpPlus, ExpMinus, ExpTimes, ExpLt, ExpIf
+from EvalML1.data import ValueInt, ValueBool, ExpInt, ExpBool, ExpPlus, ExpMinus, ExpIf
 from bases.parser import Parser, pure, string, stringr, string2, digits, bracket, infixes
 
 with Parser() as value:
@@ -18,7 +18,7 @@ with Parser() as exp:
              (string2(r'else') >> exp)
     exp_term = bracket(r'(', exp, r')') | exp_int | exp_bool
 
-    exp.define(infixes(exp_term, ExpPlus, ExpMinus, ExpTimes, ExpLt))
+    exp.define(infixes(exp_term, ExpPlus, ExpMinus))
 
 logging.basicConfig(
     format=r'[%(levelname)s]%(asctime)s: %(message)s',
@@ -27,4 +27,5 @@ logging.basicConfig(
 )
 
 if __name__ == '__main__':
-    print(exp.run(r'1+2+3+4+5+6'))
+    # print((exp_term - binary_op(ExpPlus) + exp_term).run(r'2+2'))
+    print(exp.run(r'2+2-2+3-111'))
