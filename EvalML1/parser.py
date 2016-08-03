@@ -1,5 +1,3 @@
-import logging
-
 from EvalML1.data import ValueInt, ValueBool, ExpInt, ExpBool, ExpPlus, ExpMinus, ExpTimes, ExpLt, ExpIf
 from EvalML1.rule import EvalTo, PlusIs, MinusIs, TimesIs, LtIs
 from bases.parser import Parser, pure, string, stringr, string2, digits, bracket, infixes
@@ -41,11 +39,6 @@ with Parser() as assertion:
 
     assertion.define(eval_to | plus_is | minus_is | times_is | lt_is)
 
-logging.basicConfig(
-    format=r'[%(levelname)s]%(asctime)s: %(message)s',
-    datefmt='%Y/%m/%d-%H:%M:%S',
-    level=logging.DEBUG,
-)
 
 if __name__ == '__main__':
     print(exp.run(r'3+4*3'))

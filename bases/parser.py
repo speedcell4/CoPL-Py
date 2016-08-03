@@ -265,11 +265,12 @@ def bracket(l: Union[str, Parser], parser: Parser, r: Union[str, Parser]) -> Par
     return l >> spaces >> parser << spaces << r
 
 
-logging.basicConfig(
-    format=r'[%(levelname)s]%(asctime)s: %(message)s',
-    datefmt='%Y/%m/%d-%H:%M:%S',
-    level=logging.DEBUG,
-)
+# logging.basicConfig(
+#     format=r'[%(levelname)s]%(asctime)s: %(message)s',
+#     datefmt='%Y/%m/%d-%H:%M:%S',
+#     level=logging.DEBUG,
+# )
+
 
 if __name__ == '__main__':
     class add(object):
