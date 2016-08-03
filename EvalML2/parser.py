@@ -1,7 +1,7 @@
 from EvalML1.parser import value, exp_int, exp_bool, plus_is, minus_is, times_is, lt_is
 from EvalML2.data import Var, EnvItem, Env, ExpVar, ExpPlus, ExpMinus, ExpTimes, ExpLt, ExpLet, ExpIf
 from EvalML2.rule import EvalToEnv
-from bases.parser import Parser, alphas, pure, string2, sep_until, stringr, infixes, bracket
+from bases.parser import Parser, alphas, pure, string2, sep_until, infixes, bracket
 
 with Parser() as var:
     var.define(pure(Var) + alphas)
@@ -15,15 +15,15 @@ with Parser() as exp:
     exp_var = (pure(ExpVar)) + var
 
     exp_if = (pure(lambda a: lambda b: lambda c: ExpIf(a, b, c))) + \
-             (stringr(r'if') >> exp) + \
+             (string2(r'if') >> exp) + \
              (string2(r'then') >> exp) + \
              (string2(r'else') >> exp)
 
     exp_let = (pure(lambda a: lambda b: lambda c: ExpLet(a, b, c))) + \
-              (stringr(r'let') >> var) + \
+              (string2(r'let') >> var) + \
               (string2(r'=') >> exp) + \
               (string2(r'in') >> exp)
-    exp_term = bracket(r'(', exp, r')') | exp_int | exp_bool | exp_if | exp_var | exp_let
+    exp_term = bracket(r'(', exp, r')') | exp_int | exp_bool | exp_if | exp_let | exp_var
 
     exp.define(infixes(exp_term, ExpPlus, ExpMinus, ExpTimes, ExpLt))
 

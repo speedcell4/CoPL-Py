@@ -37,6 +37,7 @@ def type_checking(fn):
 def generate_unittest(name: str, solver, indices: Iterable[int]) -> type(unittest.TestCase):
     def test_method(index):
         def wrapper(self):
+            self.maxDiff = None
             self.assertEqual(load_answer(index), solver(load_problem(index)))
 
         return wrapper
@@ -49,19 +50,19 @@ def generate_unittest(name: str, solver, indices: Iterable[int]) -> type(unittes
 @type_checking
 def load_problem(index: int) -> str:
     with open(PROBLEM.format(index), 'r') as reader:
-        return ''.join(reader.readlines()).strip()
+        return ''.join(reader.readlines())
 
 
 @type_checking
 def load_answer(index: int) -> str:
     with open(ANSWER.format(index), 'r') as reader:
-        return ''.join(reader.readlines()).strip()
+        return ''.join(reader.readlines())
 
 
 @type_checking
 def dump_answer(answer: str, index: int) -> None:
     with open(ANSWER.format(index), 'w') as writer:
-        writer.write(answer.strip())
+        writer.write(answer)
 
 
 if __name__ == '__main__':

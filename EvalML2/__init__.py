@@ -6,4 +6,4 @@ from bases.util import load_problem, dump_answer
 EvalML2 = Solver(assertion, eval_ml_2)
 
 if __name__ == '__main__':
-    dump_answer(EvalML2(load_problem(36)), 36)
+    dump_answer(EvalML2(load_problem(37)), 37)

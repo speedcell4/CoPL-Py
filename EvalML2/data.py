@@ -75,10 +75,11 @@ class Env(object):
 
     @type_checking
     def update(self, x: Var, v: Value) -> 'Env':
-        if self.items and self.items[-1].x == x:
-            return Env(self.items[:-1:] + [EnvItem(x, v)])
-        else:
-            return Env(self.items[::] + [EnvItem(x, v)])
+        # if self.items and self.items[-1].x == x:
+        #     return Env(self.items[:-1:] + [EnvItem(x, v)])
+        # else:
+        #     return Env(self.items[::] + [EnvItem(x, v)])
+        return Env(self.items[::] + [EnvItem(x, v)])
 
     @type_checking
     def __getitem__(self, x: Exp) -> Value:
