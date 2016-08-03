@@ -10,6 +10,7 @@ PROBLEM = os.path.join(PROJECT_DIR, r'problem', r'P{:03}.txt')
 
 def type_checking(fn):
     type_error_info = r'{} should be {} instead of {}.'
+    range_error_info = r'{} is out of range {}.'
 
     def wrapper(*args, **kwargs):
         for vari, varname in enumerate(fn.__code__.co_varnames):

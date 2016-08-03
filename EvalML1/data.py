@@ -56,10 +56,7 @@ class ValueBool(Value, Token):
 
     @type_checking
     def __str__(self) -> str:
-        if self.b:
-            return 'true'
-        else:
-            return 'false'
+        return r'{}'.format(self.b).lower()
 
     @type_checking
     def __eq__(self, other: 'Value') -> bool:
@@ -105,10 +102,7 @@ class ExpInt(Exp, Token):
 class ExpBool(Exp, Token):
     @type_checking
     def __str__(self) -> str:
-        if self.b:
-            return 'true'
-        else:
-            return 'false'
+        return r'{}'.format(self.b).lower()
 
     @type_checking
     def __init__(self, b: bool):
@@ -132,9 +126,6 @@ class ExpPlus(Exp, BinaryOp):
 
     associate = 0
     precedence = 2
-
-    def __str__(self):
-        return r'({} + {})'.format(self.a, self.b)
 
     @type_checking
     def __init__(self, a: Exp, b: Exp):

@@ -1,75 +1,84 @@
-import logging
+from bases.util import type_checking
+
+
+class RenderError(Exception):
+    pass
 
 
 class BaseToken(object):
-    def paraphrase(self, parent: 'BaseToken', index: int) -> str:
+    @type_checking
+    def sub(self, index: int) -> str:
         raise NotImplementedError
 
-
-class Token(BaseToken):
-    def paraphrase(self, parent: 'BaseToken', index: int) -> str:
-        return r'{}'.format(self)
-
+    @type_checking
     def __str__(self) -> str:
         raise NotImplementedError
 
 
+class Token(BaseToken):
+    @type_checking
+    def sub(self, index: int) -> str:
+        raise RenderError
+
+
 class Operator(BaseToken):
-    operator = None
-    precedence = -1
+    operator = None  # type: str
+    precedence = -1  # type: int
 
-    def paraphrase(self, parent: 'BaseToken', index: int) -> str:
-        raise NotImplementedError
-
-    def __str__(self):
-        raise NotImplementedError
+    @type_checking
+    def sub(self, index: int) -> str:
+        raise RenderError
 
 
 class UnaryOp(Operator):
-    a = None
+    a = None  # type: BaseToken
 
-    def paraphrase(self, parent: 'BaseToken', index: int) -> str:
-        return r'{}'.format(self.__str__())
+    @type_checking
+    def sub(self, index: int) -> str:
+        if index not in [0]:
+            raise RenderError
+        return r'{}'.format(self.a)
 
-    def __str__(self):
-        assert isinstance(self.a, BaseToken)
-        return r'{} {}'.format(self.operator, self.a.paraphrase(self, 0))
+    @type_checking
+    def __str__(self) -> str:
+        return r'{}'.format(self.a)
 
 
 class BinaryOp(Operator):
-    a = None
-    b = None
+    a = None  # type: BaseToken
+    b = None  # type: BaseToken
 
-    associate = -1
+    associate = -1  # type: int
 
-    def paraphrase(self, parent: 'BaseToken', index: int) -> str:
-        if isinstance(parent, Token):
-            raise TypeError('parent {} could not be {}'.format(parent, Token.__name__))
-        elif isinstance(parent, UnaryOp):
-            raise NotImplementedError
-        elif isinstance(parent, BinaryOp):
-            if self.precedence < parent.precedence:
+    @type_checking
+    def __str__(self) -> str:
+        return r'{} {} {}'.format(self.sub(0), self.operator, self.sub(1))
+
+    @type_checking
+    def sub(self, index: int) -> str:
+        child = [self.a, self.b][index]
+
+        if isinstance(child, Operator):
+            if child.precedence < self.precedence:
+                return r'({})'.format(child)
+            if isinstance(child, BinaryOp) and child.precedence == self.precedence:
                 if self.associate != index:
-                    return '(!{}!)'.format(self.__str__())
-            return '!{}!'.format(self.__str__())
-        elif isinstance(parent, TrinaryOp):
-            raise NotImplementedError
-
-    def __str__(self):
-        assert isinstance(self.a, BaseToken)
-        assert isinstance(self.b, BaseToken)
-        # return '({} {} {})'.format(self.a, self.operator, self.b)
-        logging.debug(r'a: {}, b: {}'.format(self.a, self.b))
-        return '{} {} {}'.format(self.a.paraphrase(self, 0), self.operator, self.b.paraphrase(self, 1))
+                    return r'({})'.format(child)
+        return r'{}'.format(child)
 
 
 class TrinaryOp(Operator):
-    a = None
-    b = None
-    c = None
+    a = None  # type: BaseToken
+    b = None  # type: BaseToken
+    c = None  # type: BaseToken
 
-    def paraphrase(self, parent: 'BaseToken', index: int) -> str:
-        pass
+    @type_checking
+    def __str__(self) -> str:
+        return r'{} {} {} {} {} {}'.format(
+            self.operator[0], self.sub(0),
+            self.operator[1], self.sub(1),
+            self.operator[2], self.sub(2))
 
-    def __str__(self):
-        return r'{} {} {} {} {} {}'.format(self.operator[0], self.a, self.operator[1], self.b, self.operator[2], self.c)
+    @type_checking
+    def sub(self, index: int) -> str:
+        return r'{}'.format([self.a, self.b, self.c][index])
