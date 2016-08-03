@@ -48,4 +48,4 @@ logging.basicConfig(
 )
 
 if __name__ == '__main__':
-    print(assertion.run(r'3+4 evalto 7'))
+    print(exp.run(r'3+4*3'))

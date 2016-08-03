@@ -29,7 +29,7 @@ class Parser(object):
 
     @type_checking
     def run(self, raw: str):
-        logging.debug(r'raw: {}'.format(raw))
+        logging.info(r'raw: {}'.format(raw))
         return self(raw)[1]
 
     def __call__(self, raw: str) -> Tuple[str, Any]:
@@ -41,6 +41,7 @@ class Parser(object):
             try:
                 raw1, ans1 = self(raw)
                 raw2, ans2 = other(raw1)
+                logging.info(raw2)
                 return raw2, ans1(ans2)
             except TypeError:
                 return None
@@ -53,6 +54,7 @@ class Parser(object):
             try:
                 raw1, ans1 = self(raw)
                 raw2, ans2 = other(raw1)
+                logging.info(raw2)
                 return raw2, ans2(ans1)
             except TypeError:
                 return None
@@ -65,7 +67,9 @@ class Parser(object):
             try:
                 raw1, ans1 = self(raw)
                 raw2, ans2 = other(raw1)
-                return ans2(ans1)(raw2)
+                raw3, ans3 = ans2(ans1)(raw2)
+                logging.info(raw3)
+                return raw3, ans3
             except TypeError:
                 return None
 
@@ -76,10 +80,15 @@ class Parser(object):
         def wrapper(raw: str) -> Tuple[str, Any]:
             try:
                 raw1, ans1 = self(raw)
+                logging.info(raw1)
                 return raw1, ans1
-            except (TypeError, ValueError) as error:
-                # logging.debug(r'or {}'.format(error))
-                return other(raw)
+            except (TypeError, ValueError):
+                try:
+                    raw1, ans1 = other(raw)
+                    logging.info(raw1)
+                    return raw1, ans1
+                except TypeError:
+                    return None
 
         return Parser(wrapper)
 
@@ -89,6 +98,7 @@ class Parser(object):
             try:
                 raw1, ans1 = self(raw)
                 raw2, ans2 = other(raw1)
+                logging.info(raw2)
                 return raw2, ans1
             except TypeError:
                 return None
@@ -101,6 +111,7 @@ class Parser(object):
             try:
                 raw1, ans1 = self(raw)
                 raw2, ans2 = other(raw1)
+                logging.info(raw2)
                 return raw2, ans2
             except TypeError:
                 return None
@@ -130,6 +141,7 @@ digit = satisfy(str.isdigit)
 alpha = satisfy(str.isalpha)
 
 
+@type_checking
 def many(item: Parser) -> Parser:
     with Parser() as parser:
         collection = pure(lambda a: lambda b: a + b) + item + parser
@@ -141,6 +153,14 @@ def many(item: Parser) -> Parser:
 spaces = many(space)
 digits = many(digit)
 alphas = many(alpha)
+
+
+@type_checking
+def sep_until(item: Parser, sep: str) -> Parser:
+    with Parser() as parser:
+        empty = pure([])
+        parser.define(pure(lambda a: lambda b: [a] + b) + item + ((string2(sep) >> parser) | empty))
+        return parser | empty
 
 
 @type_checking
@@ -202,13 +222,12 @@ def binary_op(op: BinaryOp) -> Parser:
 def chainl(token: Parser, *ops: type(BinaryOp)) -> Parser:
     assert all(o.precedence == ops[0].precedence and o.associate == ops[0].associate for o in ops)
 
-    with Parser() as rest:
-        @type_checking
-        def rest(x) -> Parser:
-            return functools.reduce(
-                or_, [pure(x) - binary_op(o) + token for o in ops]) * pure(rest) | pure(x)
+    @type_checking
+    def rest(x) -> Parser:
+        return functools.reduce(
+            or_, [pure(x) - binary_op(o) + token for o in ops]) * pure(rest) | pure(x)
 
-        return token * pure(rest)
+    return token * pure(rest)
 
 
 @type_checking
@@ -234,7 +253,7 @@ def infixes(token: Parser, *ops: type(BinaryOp)) -> Parser:
         for (precedence, associate), ops in itertools.groupby(sorted(ops, reverse=True, key=key), key=key):
             # ops = list(ops)
             # logging.info(r'{} {} => {}'.format(precedence, associate, ops))
-            # logging.debug(r'{}'.format(ops))
+            # logging.info(r'{}'.format(ops))
             terms.append(chain(terms[-1], *ops))
         exp.define(terms[-1])
         return exp
