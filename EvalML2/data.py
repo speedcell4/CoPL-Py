@@ -70,6 +70,10 @@ class Env(object):
         self.items = items
 
     @type_checking
+    def __eq__(self, other: 'Env') -> bool:
+        return self.items == other.items
+
+    @type_checking
     def __str__(self) -> str:
         return ', '.join(str(item) for item in self.items)
 
