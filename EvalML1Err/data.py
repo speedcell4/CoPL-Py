@@ -14,7 +14,7 @@ class ResBool(Res, ValueBool):
     pass
 
 
-class ResError(Res):
+class ResErr(Res):
     @type_checking
     def __str__(self) -> str:
         return r'error'
