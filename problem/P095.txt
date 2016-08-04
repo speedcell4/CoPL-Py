@@ -1,0 +1,1 @@
+|- let compose = fun f -> fun g -> fun x -> {f ({g x})} in let p = fun x -> x * x in let q = fun x -> x + 4 in {{compose p} q} : int -> int

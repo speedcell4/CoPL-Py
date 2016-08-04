@@ -35,7 +35,7 @@ class System(object):
             try:
                 logging.debug(r'{}try {} by using {}'.format(indent(depth), assertion, rule))
                 subs = rule(assertion)
-                logging.debug(r'{}get {} by using {}'.format(indent(depth), subs, rule))
+                logging.debug(r'{}fet {} by using {}'.format(indent(depth), subs, rule))
                 if subs is None:
                     continue
                 else:
