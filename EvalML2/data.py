@@ -75,6 +75,9 @@ class EnvItem(object):
         return (self.x, self.v) == (other.x, other.v)
 
 
+import logging
+
+
 class Env(object):
     @type_checking
     def __init__(self, items: List[EnvItem]):
@@ -98,6 +101,7 @@ class Env(object):
 
     @type_checking
     def __getitem__(self, x: Exp) -> Value:
+        logging.debug(r'disptch {} :: {}'.format(x, type(x)))
         return self.__getattribute__('__getitem__{}__'.format(x.__class__.__name__))(x)
 
     @type_checking
@@ -153,6 +157,7 @@ class Env(object):
     def __getitem__ExpVar__(self, e: ExpVar) -> Value:
         for item in self.items[::-1]:
             if item.x == e.x:
+                logging.debug(r'EnvVar {} :: {} -> {} :: {}'.format(item.x, type(item.x), item.v, type(item.v)))
                 return item.v
         raise IndexError(r'{} is not in environment'.format(e))
 

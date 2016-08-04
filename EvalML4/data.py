@@ -35,7 +35,7 @@ class ValueCons(Value, Token):
 
     @type_checking
     def __str__(self) -> str:
-        return r'{}::{}'.format(self.v1, self.v2)
+        return r'({} :: {})'.format(self.v1, self.v2)
 
 
 class ExpNil(Exp, Token):
@@ -71,6 +71,10 @@ class ExpCons(Exp, BinaryOp):
     def value(self) -> Value:
         raise NotImplementedError
 
+    @type_checking
+    def __str__(self) -> str:
+        return r'({} {} {})'.format(self.sub(0), self.operator, self.sub(1))
+
 
 @type_checking
 def __getitem__ExpCons__(self: Env, e: ExpCons) -> Value:
@@ -85,10 +89,10 @@ Env.__getitem__ExpCons__ = __getitem__ExpCons__
 class ExpMatch(Exp, BaseToken):
     @type_checking
     def __init__(self, e1: Exp, e2: Exp, x: Var, y: Var, e3: Exp):
-        self.x = x
-        self.y = y
         self.e1 = e1
         self.e2 = e2
+        self.x = x
+        self.y = y
         self.e3 = e3
 
     def __str__(self) -> str:

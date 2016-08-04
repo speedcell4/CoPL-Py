@@ -1,7 +1,4 @@
-import logging
-
-import EvalML3.parser as EvalML3
-from EvalML3.parser import exp_var, exp_int, exp_bool, var, plus_is, minus_is, times_is, lt_is, env
+from EvalML3.parser import value_rec, value_fn, value_int, value_bool, var, exp_int, exp_bool, exp_var, env
 from EvalML4.data import *
 from EvalML4.rule import EvalToEnv
 from bases.parser import Parser, pure, string, curry2, curry5, string2, stringl, stringr, bracket, infixes, spaces
@@ -9,9 +6,10 @@ from bases.parser import Parser, pure, string, curry2, curry5, string2, stringl,
 with Parser() as value:
     value_nil = pure(ValueNil()) << string(r'[]')
 
-    value_cons = pure(curry2(ValueCons)) + value + (string2(r'::') >> value)
+    value_cons = pure(curry2(ValueCons)) + (value_nil | value_rec | value_fn | value_int | value_bool) + (
+        string2(r'::') >> value)
 
-    value.define(value_nil | value_cons | EvalML3.value)
+    value.define(value_nil | value_cons | value_rec | value_fn | value_int | value_bool)
 
 with Parser() as exp:
     exp_fn = pure(lambda x: lambda e: ExpFn(x, e)) + \
@@ -55,14 +53,7 @@ with Parser() as exp:
 with Parser() as assertion:
     eval_to_env = (pure(lambda env: lambda e: lambda v: EvalToEnv(env, e, v))) + \
                   (env << string2(r'|-')) + (exp << string2(r'evalto')) + value
-    assertion.define(eval_to_env | plus_is | minus_is | times_is | lt_is)
-
-logging.basicConfig(
-    format=r'[%(levelname)s- %(funcName)s]%(asctime)s: %(message)s',
-    datefmt='%Y/%m/%d-%H:%M:%S',
-    level=logging.DEBUG,
-)
+    assertion.define(eval_to_env)
 
 if __name__ == '__main__':
-    print(value.run(
-        r'5'))
+    print(value.run(r'5'))

@@ -4,8 +4,8 @@ from EvalML3.data import *
 from bases.parser import Parser, string2, stringr, stringl, pure, spaces, bracket, infixes
 
 __all__ = [
-    'value', 'value_int', 'value_bool',
-    'exp', 'exp_int', 'exp_bool', 'exp_if', 'exp_var', 'exp_let',
+    'value', 'value_int', 'value_bool', 'value_fn', 'value_rec',
+    'exp', 'exp_int', 'exp_bool', 'exp_if', 'exp_var', 'exp_let', 'exp_call', 'exp_fn', 'exp_rec',
     'var',
     'env_item', 'env',
     'assertion', 'eval_to', 'plus_is', 'minus_is', 'times_is', 'lt_is',

@@ -1,0 +1,1 @@
+|- let rec append = fun l1 -> fun l2 -> match l1 with [] -> l2 | x :: y -> x :: {{append y} l2} in {{append (1 :: 2 :: [])} (3 :: 4 :: 5 :: [])} evalto 1 :: 2 :: 3 :: 4 :: 5 :: []

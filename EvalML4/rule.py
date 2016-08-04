@@ -1,10 +1,20 @@
 from typing import List
 
-from EvalML3.rule import EvalToEnv, EInt, EBool, EIfT, EIfF, EPlus, EMinus, ETimes, ELt, EVar1, EVar2, ELet, EFun, EApp, \
+from EvalML3.rule import EvalToEnv, EInt, EBool, EIfT, EIfF, EPlus, EMinus, ETimes, ELt, ELet, EFun, EApp, \
     ELetRec, EAppRec, BPlus, BMinus, BTimes, BLt
 from EvalML4.data import *
 from bases.derivation import Assertion, Rule, System
 from bases.util import type_checking
+
+
+class EVar(Rule):
+    name = r'E-Var'
+
+    @type_checking
+    def __call__(self, assertion: EvalToEnv) -> List[Assertion]:
+        env, e, v = assertion.args
+        if isinstance(e, ExpVar) and env[e] == v:
+            return []
 
 
 class ENil(Rule):
@@ -13,7 +23,7 @@ class ENil(Rule):
     @type_checking
     def __call__(self, assertion: EvalToEnv) -> List[Assertion]:
         env, e, v = assertion.args
-        if isinstance(e, ExpNil) and isinstance(v, ExpNil):
+        if isinstance(e, ExpNil) and isinstance(v, ValueNil):
             return []
 
 
@@ -29,6 +39,9 @@ class ECons(Rule):
             return [EvalToEnv(env, e1, v1), EvalToEnv(env, e2, v2)]
 
 
+import logging
+
+
 class EMatchNil(Rule):
     name = r'E-MatchNil'
 
@@ -37,9 +50,11 @@ class EMatchNil(Rule):
         env, e, v = assertion.args
         if isinstance(e, ExpMatch):
             e1, e2, x, y, e3 = e.e1, e.e2, e.x, e.y, e.e3
-            nil, v = env[e1], env[e2]
-            if isinstance(nil, ValueNil()):
-                return [EvalToEnv(env, e1, nil), EvalToEnv(env, e3, v)]
+            nil = env[e1]
+            logging.debug(r'{} :: {}'.format(nil, type(nil)))
+            if isinstance(nil, ValueNil):
+                v = env[e2]
+                return [EvalToEnv(env, e1, nil), EvalToEnv(env, e2, v)]
 
 
 class EMatchCons(Rule):
@@ -50,12 +65,14 @@ class EMatchCons(Rule):
         env, e, v = assertion.args
         if isinstance(e, ExpMatch):
             e1, e2, x, y, e3 = e.e1, e.e2, e.x, e.y, e.e3
-            cons, v = env[e1], env[e2]
+            cons = env[e1]
             if isinstance(cons, ValueCons):
                 v1, v2 = cons.v1, cons.v2
-                return [EvalToEnv(env, e1, ValueCons(v1, v2)), EvalToEnv(env.update(x, v1).update(y, v2), e3, v)]
+                env2 = env.update(x, v1).update(y, v2)
+                v = env2[e3]
+                return [EvalToEnv(env, e1, cons), EvalToEnv(env2, e3, v)]
 
 
 eval_ml_4 = System([
-    EInt(), EBool(), EIfT(), EIfF(), EPlus(), EMinus(), ETimes(), ELt(), EVar1(), EVar2(), ELet(), EFun(), EApp(),
+    EInt(), EBool(), EIfT(), EIfF(), EPlus(), EMinus(), ETimes(), ELt(), EVar(), ELet(), EFun(), EApp(),
     ELetRec(), EAppRec(), ENil(), ECons(), EMatchNil(), EMatchCons(), BPlus(), BMinus(), BTimes(), BLt()])

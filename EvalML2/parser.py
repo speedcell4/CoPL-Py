@@ -1,7 +1,7 @@
 from EvalML1.parser import *
 from EvalML2.data import Var, EnvItem, Env, ExpVar, ExpPlus, ExpMinus, ExpTimes, ExpLt, ExpLet, ExpIf
 from EvalML2.rule import EvalToEnv
-from bases.parser import Parser, alphas, pure, string2, sep_until, infixes, bracket
+from bases.parser import Parser, identity, pure, string2, sep_until, infixes, bracket
 
 __all__ = [
     'value', 'value_int', 'value_bool',
@@ -12,7 +12,7 @@ __all__ = [
 ]
 
 with Parser() as var:
-    var.define(pure(Var) + alphas)
+    var.define(pure(Var) + identity)
 
 with Parser() as env:
     env_item = (pure(lambda a: lambda b: EnvItem(a, b)) + var + (string2(r'=') >> value))

@@ -189,6 +189,8 @@ def string(const: str) -> Parser:
     return wrapper
 
 
+identity = pure(lambda a: lambda b: a + b) + (string(r'_') | alpha) + many(string(r'_') | alpha | digit)
+
 stringl = lambda const: spaces >> string(const)
 stringr = lambda const: string(const) << spaces
 string2 = lambda const: spaces >> string(const) << spaces
@@ -292,26 +294,4 @@ def bracket(l: Union[str, Parser], parser: Parser, r: Union[str, Parser]) -> Par
 
 
 if __name__ == '__main__':
-    class add(object):
-        def __init__(self, a, b):
-            self.a = a
-            self.b = b
-
-        def __str__(self):
-            return r'{} + {}'.format(self.a, self.b)
-
-
-    class sub(object):
-        def __init__(self, a, b):
-            self.a = a
-            self.b = b
-
-        def __str__(self):
-            return r'{} - {}'.format(self.a, self.b)
-
-
-    miaos = [lambda a: lambda b: o(a, b) for o in [add, sub]]
-
-    for a, b in zip(range(3), range(3)):
-        for miao in miaos:
-            print(miao(a, b))
+    print(identity.run(r'l1'))

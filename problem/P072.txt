@@ -1,0 +1,1 @@
+|- let rec f = fun x -> if x < 1 then [] else x :: {f (x - 1)} in {f 3} evalto 3 :: 2 :: 1 :: []

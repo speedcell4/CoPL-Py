@@ -1,0 +1,1 @@
+|- let rec apply = fun l -> fun x -> match l with [] -> x | f :: l -> {f ({{apply l} x})} in {{apply ((fun x -> x * x) :: (fun y -> y + 3) :: [])} 4} evalto 49
