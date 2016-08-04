@@ -21,6 +21,12 @@ class Token(BaseToken):
         raise RenderError
 
 
+class Function(Token):
+    @type_checking
+    def sub(self, index: int) -> str:
+        raise RenderError
+
+
 class Operator(BaseToken):
     operator = None  # type: str
     precedence = -1  # type: int
@@ -64,6 +70,8 @@ class BinaryOp(Operator):
             if isinstance(child, BinaryOp) and child.precedence == self.precedence:
                 if self.associate != index:
                     return r'({})'.format(child)
+        elif isinstance(child, Function):
+            return r'({})'.format(child)
         return r'{}'.format(child)
 
 

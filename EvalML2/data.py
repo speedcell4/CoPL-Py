@@ -63,6 +63,10 @@ class EnvItem(object):
     def __str__(self) -> str:
         return r'{} = {}'.format(self.x, self.v)
 
+    @type_checking
+    def __eq__(self, other: 'EnvItem') -> bool:
+        return (self.x, self.v) == (other.x, other.v)
+
 
 class Env(object):
     @type_checking
@@ -101,32 +105,32 @@ class Env(object):
     def __getitem__ExpPlus__(self, e: ExpPlus) -> ValueInt:
         a_value = self[e.a]
         b_value = self[e.b]
-        assert isinstance(a_value, ValueInt)
-        assert isinstance(b_value, ValueInt)
+        # assert isinstance(a_value, ValueInt)
+        # assert isinstance(b_value, ValueInt)
         return a_value + b_value
 
     @type_checking
     def __getitem__ExpMinus__(self, e: ExpMinus) -> ValueInt:
         a_value = self[e.a]
         b_value = self[e.b]
-        assert isinstance(a_value, ValueInt)
-        assert isinstance(b_value, ValueInt)
+        # assert isinstance(a_value, ValueInt)
+        # assert isinstance(b_value, ValueInt)
         return a_value - b_value
 
     @type_checking
     def __getitem__ExpTimes__(self, e: ExpTimes) -> ValueInt:
         a_value = self[e.a]
         b_value = self[e.b]
-        assert isinstance(a_value, ValueInt)
-        assert isinstance(b_value, ValueInt)
+        # assert isinstance(a_value, ValueInt), r'{} {}'.format(a_value, type(a_value))
+        # assert isinstance(b_value, ValueInt), r'{} {}'.format(a_value, type(a_value))
         return a_value * b_value
 
     @type_checking
     def __getitem__ExpLt__(self, e: ExpLt) -> ValueBool:
         a_value = self[e.a]
         b_value = self[e.b]
-        assert isinstance(a_value, ValueInt)
-        assert isinstance(b_value, ValueInt)
+        # assert isinstance(a_value, ValueInt)
+        # assert isinstance(b_value, ValueInt)
         return a_value < b_value
 
     @type_checking

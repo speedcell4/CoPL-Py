@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from EvalML1.rule import PlusIs, MinusIs, TimesIs, LtIs, BPlus, BMinus, BTimes, BLt
@@ -43,8 +44,11 @@ class EVar1(Rule):
     @type_checking
     def __call__(self, assertion: EvalToEnv) -> List[Assertion]:
         env, e, v = assertion.args
+        logging.debug(r'EVar1: {} |- {} -> {}'.format(env, e, v))
         if isinstance(e, ExpVar) and env.items:
+            logging.debug(r'EVar1: 2 :: {} {} '.format(env.items[-1].x, e))
             if env.items[-1].x == e.x and env.items[-1].v == v:
+                logging.debug(r'EVar1: ok')
                 return []
 
 
@@ -65,10 +69,19 @@ class EPlus(Rule):
     @type_checking
     def __call__(self, assertion: EvalToEnv) -> List[Assertion]:
         env, e, v = assertion.args
+        logging.debug(r'EPlus => {}, {}, {}'.format(env, e, v))
+        logging.debug(r'EPlus => {} {} {} {}'.format(type(e), ExpPlus, type(v), ValueInt))
         if isinstance(e, ExpPlus) and isinstance(v, ValueInt):
+            logging.debug('EPlus: 1')
             e1, e2 = e.a, e.b
-            i1, i2, i3 = env[e1], env[e2], v
+            logging.debug('EPlus: ({})::{} + ({})::{}'.format(e1, type(e1), e2, type(e2)))
+            try:
+                i1, i2, i3 = env[e1], env[e2], v
+            except Exception as error:
+                logging.exception(error)
+            logging.debug('EPlus: 2')
             if isinstance(i1, ValueInt) and isinstance(i2, ValueInt):
+                logging.debug('EPlus: 3')
                 return [EvalToEnv(env, e1, i1), EvalToEnv(env, e2, i2), PlusIs(i1, i2, i3)]
 
 

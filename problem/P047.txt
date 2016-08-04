@@ -1,0 +1,1 @@
+|- let twice = fun f -> fun x -> {f ({f x})} in {{{twice twice} (fun x -> x * x)} 2} evalto 65536

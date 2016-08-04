@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from EvalML2.rule import Assertion, Rule, System, EvalToEnv, EInt, EBool, EIfT, EIfF, EPlus, EMinus, ETimes, ELt, EVar1, \
@@ -13,6 +14,8 @@ class EFun(Rule):
     def __call__(self, assertion: EvalToEnv) -> List[Assertion]:
         env, e, v = assertion.args
         if isinstance(e, ExpFn) and isinstance(v, ValueFn):
+            logging.debug(r'EFun => {} {} {}'.format(env, e, v))
+            logging.info(r'{} == {}, {}'.format(env, v.env, env == v.env))
             if (env, e.x, e.e) == (v.env, v.x, v.e):
                 return []
 
@@ -23,6 +26,8 @@ class EApp(Rule):
     @type_checking
     def __call__(self, assertion: EvalToEnv) -> List[Assertion]:
         env, e, v = assertion.args
+        logging.debug(r'EApp: {} |- {} evalto {}'.format(env, e, v))
+
         if isinstance(e, ExpCall):
             e1, e2 = e.e1, e.e2
             v1, v2 = env[e1], env[e2]
@@ -60,7 +65,7 @@ class EAppRec(Rule):
                         EvalToEnv(env2.update(x, ValueRec(env2, x, y, e0)).update(y, v2), e0, v)]
 
 
-EvalML3 = System([
+eval_ml_3 = System([
     EInt(), EBool(), EIfT(), EIfF(), EPlus(), EMinus(), ETimes(), ELt(), EVar1(), EVar2(), ELet(), EFun(), EApp(),
     ELetRec(), EAppRec(), BPlus(), BMinus(), BTimes(), BLt()
 ])

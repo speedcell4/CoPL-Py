@@ -1,0 +1,1 @@
+|- let s = fun f -> fun g -> fun x -> {{f x} ({g x})} in let k = fun x -> fun y -> x in {{{s k} k} 7} evalto 7

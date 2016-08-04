@@ -1,0 +1,1 @@
+|- let sm = fun f -> {f 3} + {f 4} in {sm (fun x -> x * x)} evalto 25

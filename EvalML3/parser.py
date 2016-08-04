@@ -1,8 +1,7 @@
 import EvalML2.parser as EvalML2
-from EvalML2.parser import env, var, exp, exp_int, exp_bool, exp_var, exp_if, exp_let, EvalToEnv, plus_is, minus_is, \
+from EvalML2.parser import env, var, exp, exp_int, exp_bool, exp_var, EvalToEnv, plus_is, minus_is, \
     times_is, lt_is
-from EvalML3.data import ExpPlus, ExpMinus, ExpTimes, ExpLt, \
-    ValueFn, ValueRec, ExpCall, ExpFn, ExpRec
+from EvalML3.data import *
 from bases.parser import Parser, string2, stringr, stringl, pure, spaces, bracket, infixes
 
 with Parser() as value:
@@ -24,6 +23,16 @@ with Parser() as exp:
              (stringr(r'fun') >> var) + \
              (string2(r'->') >> exp)
 
+    exp_if = (pure(lambda a: lambda b: lambda c: ExpIf(a, b, c))) + \
+             (string2(r'if') >> exp) + \
+             (string2(r'then') >> exp) + \
+             (string2(r'else') >> exp)
+
+    exp_let = (pure(lambda a: lambda b: lambda c: ExpLet(a, b, c))) + \
+              (string2(r'let') >> var) + \
+              (string2(r'=') >> exp) + \
+              (string2(r'in') >> exp)
+
     exp_call = (stringr(r'{') >> pure(lambda e1: lambda e2: ExpCall(e1, e2))) + \
                (exp << spaces) + \
                (exp << stringl(r'}'))
@@ -34,8 +43,7 @@ with Parser() as exp:
               (string2(r'->') >> exp) + \
               (string2(r'in') >> exp)
 
-    exp_term = bracket(r'(', exp,
-                       r')') | exp_int | exp_bool | exp_rec | exp_let | exp_fn | exp_if | exp_call | exp_var
+    exp_term = bracket(r'(', exp, r')') | exp_int | exp_bool | exp_fn | exp_rec | exp_let | exp_if | exp_call | exp_var
 
     exp.define(infixes(exp_term, ExpPlus, ExpMinus, ExpTimes, ExpLt))
 
@@ -44,13 +52,5 @@ with Parser() as assertion:
                   (env << string2(r'|-')) + (exp << string2(r'evalto')) + value
     assertion.define(eval_to_env | plus_is | minus_is | times_is | lt_is)
 
-import logging
-
-logging.basicConfig(
-    format=r'[%(levelname)s]%(asctime)s: %(message)s',
-    datefmt='%Y/%m/%d-%H:%M:%S',
-    level=logging.DEBUG,
-)
-
 if __name__ == '__main__':
-    print(assertion.run(r'|- fun x -> x + 1 evalto ()[fun x -> x + 1]'))
+    print(exp.run(r'let y = 2 in fun x -> x + y'))

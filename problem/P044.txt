@@ -1,0 +1,1 @@
+|- let max = fun x -> fun y -> if x < y then y else x in {{max 3} 5} evalto 5
