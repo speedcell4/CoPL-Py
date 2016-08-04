@@ -170,9 +170,9 @@ class Env(object):
     def __getitem__ExpPlus__(self, e: ExpPlus) -> TypesInt:
         e1, e2 = e.a, e.b
         t1, t2 = self[e1], self[e2]
-        if not isinstance(t1, (TypesInt, TypesUnkown)):
+        if not isinstance(t1, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt'.format(e1, t1))
-        if not isinstance(t2, (TypesInt, TypesUnkown)):
+        if not isinstance(t2, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt'.format(e2, t2))
         return TypesInt()
 
@@ -180,9 +180,9 @@ class Env(object):
     def __getitem__ExpMinus__(self, e: ExpMinus) -> TypesInt:
         e1, e2 = e.a, e.b
         t1, t2 = self[e1], self[e2]
-        if not isinstance(t1, (TypesInt, TypesUnkown)):
+        if not isinstance(t1, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt'.format(e1, t1))
-        if not isinstance(t2, (TypesInt, TypesUnkown)):
+        if not isinstance(t2, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt'.format(e2, t2))
         return TypesInt()
 
@@ -190,9 +190,9 @@ class Env(object):
     def __getitem__ExpTimes__(self, e: ExpTimes) -> TypesInt:
         e1, e2 = e.a, e.b
         t1, t2 = self[e1], self[e2]
-        if not isinstance(t1, (TypesInt, TypesUnkown)):
+        if not isinstance(t1, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt'.format(e1, t1))
-        if not isinstance(t2, (TypesInt, TypesUnkown)):
+        if not isinstance(t2, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt'.format(e2, t2))
         return TypesInt()
 
@@ -200,9 +200,9 @@ class Env(object):
     def __getitem__ExpLt__(self, e: ExpLt) -> TypesBool:
         e1, e2 = e.a, e.b
         t1, t2 = self[e1], self[e2]
-        if not isinstance(t1, (TypesInt, TypesUnkown)):
+        if not isinstance(t1, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt'.format(e1, t1))
-        if not isinstance(t2, (TypesInt, TypesUnkown)):
+        if not isinstance(t2, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt'.format(e2, t2))
         return TypesBool()
 
@@ -229,7 +229,7 @@ class Env(object):
     def __getitem__ExpApp__(self, e: ExpApp) -> Types:
         e1, e2 = e.e1, e.e2
         t1, t2 = self[e1], self[e2]
-        if isinstance(t1, (TypesFun, TypesUnkown)):
+        if isinstance(t1, TypesFun):
             if t1.a == t2:
                 return t1.b
         raise TypeError('{} :: {} can not be applied to {} :: {}'.format(e2, t2, e1, t1))
@@ -246,7 +246,7 @@ class Env(object):
     def __getitem__ExpCons__(self, e: ExpCons) -> Types:
         e1, e2 = e.a, e.b
         t1, t2 = self[e1], self[e2]
-        if isinstance(t2, (TypesList, TypesUnkown)):
+        if isinstance(t2, TypesList):
             if t1 == t2.a:
                 return t1
         raise TypeError(r'{} :: {} could not cons {} :: {}'.format(e1, t1, e2, t2))
@@ -255,7 +255,7 @@ class Env(object):
     def __getitem__ExpMatch__(self, e: ExpMatch) -> Types:
         e1, e2, x, y, e3 = e.e1, e.e2, e.x, e.y, e.e3
         t1, t2 = self[e1], self[e2]
-        if isinstance(t1, (TypesList, TypesUnkown)):
+        if isinstance(t1, TypesList):
             if t2 == self.update(x, t1.a).update(y, t1.a)[e3]:
                 return t2
         raise TypeError(r'{} :: {} could not match {} :: {} or {} :: {}'.format(e1, t1, e2, t2, e3, t2))

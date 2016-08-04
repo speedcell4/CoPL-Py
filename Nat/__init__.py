@@ -1,6 +1,6 @@
 from Nat.parser import assertion
 from Nat.rule import nat
-from bases.derivation import Solver
+from bases.deduction import Solver
 from bases.util import load_problem, dump_answer
 
 Nat = Solver(assertion, nat)

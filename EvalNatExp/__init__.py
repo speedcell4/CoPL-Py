@@ -1,6 +1,6 @@
 from EvalNatExp.parser import exp, assertion
 from EvalNatExp.rule import eval_nat_exp
-from bases.derivation import Solver
+from bases.deduction import Solver
 
 EvalNatExp = Solver(assertion, eval_nat_exp)
 

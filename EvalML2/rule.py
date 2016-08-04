@@ -4,7 +4,7 @@ from typing import List
 from EvalML1.rule import PlusIs, MinusIs, TimesIs, LtIs, BPlus, BMinus, BTimes, BLt
 from EvalML2.data import Env, Value, ValueInt, ValueBool, Exp, ExpInt, ExpBool, ExpVar, ExpPlus, ExpMinus, ExpTimes, \
     ExpLet, ExpLt, ExpIf
-from bases.derivation import Assertion, Rule, System
+from bases.deduction import Assertion, Rule, System
 from bases.util import type_checking
 
 

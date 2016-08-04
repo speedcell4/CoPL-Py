@@ -5,7 +5,7 @@ from TypingML4.data import Env, Exp, Types, ExpInt, ExpBool, TypesInt, TypesBool
     ExpIf, \
     ExpLet, ExpPlus, ExpMatch, ExpMinus, ExpTimes, ExpCons, ExpNil, ExpApp, ExpFun, ExpLetRec, ExpLt, ExpVar, \
     TypesUnkown
-from bases.derivation import Assertion, Rule, System
+from bases.deduction import Assertion, Rule, System
 from bases.util import type_checking
 
 

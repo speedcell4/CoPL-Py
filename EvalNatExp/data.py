@@ -1,7 +1,7 @@
 import logging
 
 from Nat.data import Nat
-from bases.derivation import DeductionError
+from bases.deduction import DeductionError
 from bases.mixins import Token, BinaryOp
 from bases.util import type_checking
 

@@ -4,7 +4,7 @@ from typing import List
 from EvalNatExp.rule import PlusIs, TimesIs
 from Nat.rule import PZero, PSucc, TZero, TSucc
 from ReduceNatExp.data import Exp, ExpNat, ExpPlus, ExpTimes
-from bases.derivation import Assertion, Rule, System
+from bases.deduction import Assertion, Rule, System
 from bases.util import type_checking
 
 
