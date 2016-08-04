@@ -5,7 +5,7 @@ from bases.parser import Parser, string2, stringr, stringl, pure, spaces, bracke
 
 __all__ = [
     'value', 'value_int', 'value_bool', 'value_fn', 'value_rec',
-    'exp', 'exp_int', 'exp_bool', 'exp_if', 'exp_var', 'exp_let', 'exp_call', 'exp_fn', 'exp_rec',
+    'exp', 'exp_int', 'exp_bool', 'exp_if', 'exp_var', 'exp_let', 'exp_app', 'exp_fun', 'exp_let_rec',
     'var',
     'env_item', 'env',
     'assertion', 'eval_to', 'plus_is', 'minus_is', 'times_is', 'lt_is',
@@ -26,9 +26,9 @@ with Parser() as value:
     value.define(value_fn | value_rec | value_int | value_int)
 
 with Parser() as exp:
-    exp_fn = pure(lambda x: lambda e: ExpFn(x, e)) + \
-             (stringr(r'fun') >> var) + \
-             (string2(r'->') >> exp)
+    exp_fun = pure(lambda x: lambda e: ExpFun(x, e)) + \
+              (stringr(r'fun') >> var) + \
+              (string2(r'->') >> exp)
 
     exp_if = (pure(lambda a: lambda b: lambda c: ExpIf(a, b, c))) + \
              (string2(r'if') >> exp) + \
@@ -40,17 +40,18 @@ with Parser() as exp:
               (string2(r'=') >> exp) + \
               (string2(r'in') >> exp)
 
-    exp_call = (stringr(r'{') >> pure(lambda e1: lambda e2: ExpCall(e1, e2))) + \
-               (exp << spaces) + \
-               (exp << stringl(r'}'))
+    exp_app = (stringr(r'{') >> pure(lambda e1: lambda e2: ExpApp(e1, e2))) + \
+              (exp << spaces) + \
+              (exp << stringl(r'}'))
 
-    exp_rec = pure(lambda x: lambda y: lambda e1: lambda e2: ExpRec(x, y, e1, e2)) + \
-              (stringr(r'let rec') >> var) + \
-              (string2(r'= fun') >> var) + \
-              (string2(r'->') >> exp) + \
-              (string2(r'in') >> exp)
+    exp_let_rec = pure(lambda x: lambda y: lambda e1: lambda e2: ExpLetRec(x, y, e1, e2)) + \
+                  (stringr(r'let rec') >> var) + \
+                  (string2(r'= fun') >> var) + \
+                  (string2(r'->') >> exp) + \
+                  (string2(r'in') >> exp)
 
-    exp_term = bracket(r'(', exp, r')') | exp_int | exp_bool | exp_fn | exp_rec | exp_let | exp_if | exp_call | exp_var
+    exp_term = bracket(r'(', exp,
+                       r')') | exp_int | exp_bool | exp_fun | exp_let_rec | exp_let | exp_if | exp_app | exp_var
 
     exp.define(infixes(exp_term, ExpPlus, ExpMinus, ExpTimes, ExpLt))
 

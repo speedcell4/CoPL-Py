@@ -6,8 +6,8 @@ from bases.util import type_checking
 
 __all__ = [
     'Value', 'ValueInt', 'ValueBool', 'ValueFn', 'ValueRec',
-    'Exp', 'ExpInt', 'ExpBool', 'ExpPlus', 'ExpMinus', 'ExpTimes', 'ExpLt', 'ExpVar', 'ExpFn', 'ExpCall', 'ExpIf',
-    'ExpLet', 'ExpRec',
+    'Exp', 'ExpInt', 'ExpBool', 'ExpPlus', 'ExpMinus', 'ExpTimes', 'ExpLt', 'ExpVar', 'ExpFun', 'ExpApp', 'ExpIf',
+    'ExpLet', 'ExpLetRec',
     'Env', 'EnvItem', 'Var'
 ]
 
@@ -45,7 +45,7 @@ class ValueRec(Value, Function):
         return (self.env, self.x, self.y, self.e) == (other.env, other.x, other.y, other.e)
 
 
-class ExpFn(Exp, Function):
+class ExpFun(Exp, Function):
     @type_checking
     def __init__(self, x: Var, e: Exp):
         self.x = x
@@ -58,7 +58,7 @@ class ExpFn(Exp, Function):
         return r'fun {} -> {}'.format(self.x, self.e)
 
 
-class ExpCall(Exp, Function):
+class ExpApp(Exp, Function):
     @type_checking
     def __init__(self, e1: Exp, e2: Exp):
         self.e1 = e1
@@ -69,7 +69,7 @@ class ExpCall(Exp, Function):
         return r'{} ({})'.format(self.e1, self.e2)
 
 
-class ExpRec(Exp, Function):
+class ExpLetRec(Exp, Function):
     @type_checking
     def __init__(self, x: Var, y: Var, e1: Exp, e2: Exp):
         self.x = x
@@ -83,15 +83,15 @@ class ExpRec(Exp, Function):
 
 
 @type_checking
-def __getitem__ExpFn__(self: Env, e: ExpFn) -> Value:
+def __getitem__ExpFun__(self: Env, e: ExpFun) -> Value:
     return ValueFn(self, e.x, e.e)
 
 
-Env.__getitem__ExpFn__ = __getitem__ExpFn__
+Env.__getitem__ExpFun__ = __getitem__ExpFun__
 
 
 @type_checking
-def __getitem__ExpCall__(self, e: ExpCall) -> Value:
+def __getitem__ExpApp__(self, e: ExpApp) -> Value:
     logging.debug(r'ExpCall {}'.format(e))
     e1, e2 = e.e1, e.e2
     logging.debug(r'ExpCall {} {} {} {}'.format(e1, type(e1), e2, type(e2)))
@@ -107,13 +107,13 @@ def __getitem__ExpCall__(self, e: ExpCall) -> Value:
         raise ValueError(r'{} is not a ValueFn or ValueRec'.format(e1))
 
 
-Env.__getitem__ExpCall__ = __getitem__ExpCall__
+Env.__getitem__ExpApp__ = __getitem__ExpApp__
 
 
 @type_checking
-def __getitem__ExpRec__(self, e: ExpRec) -> Value:
+def __getitem__ExpLetRec__(self, e: ExpLetRec) -> Value:
     x, y, e1, e2 = e.x, e.y, e.e1, e.e2
     return self.update(x, ValueRec(self, x, y, e1))[e2]
 
 
-Env.__getitem__ExpRec__ = __getitem__ExpRec__
+Env.__getitem__ExpLetRec__ = __getitem__ExpLetRec__

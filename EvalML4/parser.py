@@ -3,6 +3,15 @@ from EvalML4.data import *
 from EvalML4.rule import EvalToEnv
 from bases.parser import Parser, pure, string, curry2, curry5, string2, stringl, stringr, bracket, infixes, spaces
 
+__all__ = [
+    'value', 'value_int', 'value_bool', 'value_fn', 'value_rec', 'value_nil', 'value_cons',
+    'exp', 'exp_int', 'exp_bool', 'exp_if', 'exp_var', 'exp_let', 'exp_call', 'exp_fn', 'exp_rec', 'exp_match',
+    'exp_nil,'
+    'var',
+    'env_item', 'env',
+    'assertion', 'eval_to_env', 'plus_is', 'minus_is', 'times_is', 'lt_is',
+]
+
 with Parser() as value:
     value_nil = pure(ValueNil()) << string(r'[]')
 
@@ -12,7 +21,7 @@ with Parser() as value:
     value.define(value_nil | value_cons | value_rec | value_fn | value_int | value_bool)
 
 with Parser() as exp:
-    exp_fn = pure(lambda x: lambda e: ExpFn(x, e)) + \
+    exp_fn = pure(lambda x: lambda e: ExpFun(x, e)) + \
              (stringr(r'fun') >> var) + \
              (string2(r'->') >> exp)
 
@@ -26,11 +35,11 @@ with Parser() as exp:
               (string2(r'=') >> exp) + \
               (string2(r'in') >> exp)
 
-    exp_call = (stringr(r'{') >> pure(lambda e1: lambda e2: ExpCall(e1, e2))) + \
+    exp_call = (stringr(r'{') >> pure(lambda e1: lambda e2: ExpApp(e1, e2))) + \
                (exp << spaces) + \
                (exp << stringl(r'}'))
 
-    exp_rec = pure(lambda x: lambda y: lambda e1: lambda e2: ExpRec(x, y, e1, e2)) + \
+    exp_rec = pure(lambda x: lambda y: lambda e1: lambda e2: ExpLetRec(x, y, e1, e2)) + \
               (stringr(r'let rec') >> var) + \
               (string2(r'= fun') >> var) + \
               (string2(r'->') >> exp) + \

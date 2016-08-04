@@ -4,8 +4,8 @@ from bases.util import type_checking
 
 __all__ = [
     'Value', 'ValueInt', 'ValueBool', 'ValueFn', 'ValueRec', 'ValueNil', 'ValueCons',
-    'Exp', 'ExpInt', 'ExpBool', 'ExpPlus', 'ExpMinus', 'ExpTimes', 'ExpLt', 'ExpVar', 'ExpFn', 'ExpCall', 'ExpIf',
-    'ExpLet', 'ExpRec', 'ExpNil', 'ExpCons', 'ExpMatch',
+    'Exp', 'ExpInt', 'ExpBool', 'ExpPlus', 'ExpMinus', 'ExpTimes', 'ExpLt', 'ExpVar', 'ExpFun', 'ExpApp', 'ExpIf',
+    'ExpLet', 'ExpLetRec', 'ExpNil', 'ExpCons', 'ExpMatch',
     'Env', 'EnvItem', 'Var'
 ]
 
