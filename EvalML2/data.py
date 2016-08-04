@@ -1,8 +1,15 @@
 from typing import List
 
-from EvalML1.data import Value, ValueInt, ValueBool, Exp, ExpInt, ExpBool, ExpPlus, ExpMinus, ExpTimes, ExpIf, ExpLt
+from EvalML1.data import *
 from bases.mixins import Token, TrinaryOp
 from bases.util import type_checking
+
+__all__ = [
+    'Value', 'ValueInt', 'ValueBool',
+    'Exp', 'ExpInt', 'ExpBool', 'ExpPlus', 'ExpMinus', 'ExpTimes', 'ExpLt', 'ExpIf', 'ExpLet', 'ExpVar',
+    'Var',
+    'Env', 'EnvItem',
+]
 
 
 class Var(object):

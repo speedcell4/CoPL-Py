@@ -32,7 +32,6 @@ def type_checking(fn):
 
     return wrapper
 
-
 @type_checking
 def generate_unittest(name: str, solver, indices: Iterable[int]) -> type(unittest.TestCase):
     def test_method(index):

@@ -1,8 +1,6 @@
 import logging
 
-from EvalML2.data import Value, Exp, Env, EnvItem, Var, ValueInt, ValueBool, ExpIf, ExpLet, ExpBool, ExpInt, ExpLt, \
-    ExpMinus, \
-    ExpPlus, ExpTimes, ExpVar
+from EvalML2.data import *
 from bases.mixins import Function
 from bases.util import type_checking
 

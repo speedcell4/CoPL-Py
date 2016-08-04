@@ -1,8 +1,15 @@
-import EvalML2.parser as EvalML2
-from EvalML2.parser import env, var, exp, exp_int, exp_bool, exp_var, EvalToEnv, plus_is, minus_is, \
-    times_is, lt_is
+from EvalML2.parser import *
+from EvalML2.rule import EvalToEnv
 from EvalML3.data import *
 from bases.parser import Parser, string2, stringr, stringl, pure, spaces, bracket, infixes
+
+__all__ = [
+    'value', 'value_int', 'value_bool',
+    'exp', 'exp_int', 'exp_bool', 'exp_if', 'exp_var', 'exp_let',
+    'var',
+    'env_item', 'env',
+    'assertion', 'eval_to', 'plus_is', 'minus_is', 'times_is', 'lt_is',
+]
 
 with Parser() as value:
     value_fn = pure(lambda env: lambda x: lambda e: ValueFn(env, x, e)) + \
@@ -16,7 +23,7 @@ with Parser() as value:
                 (stringr(r'= fun') >> var) + \
                 (string2(r'->') >> exp << stringl(r']'))
 
-    value.define(value_fn | value_rec | EvalML2.value)
+    value.define(value_fn | value_rec | value_int | value_int)
 
 with Parser() as exp:
     exp_fn = pure(lambda x: lambda e: ExpFn(x, e)) + \

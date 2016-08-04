@@ -1,17 +1,16 @@
 from bases.mixins import BinaryOp, TrinaryOp, Token
 from bases.util import type_checking
 
-
-class EvaluationError(Exception):
-    pass
+__all__ = [
+    'Value', 'ValueInt', 'ValueBool',
+    'Exp', 'ExpInt', 'ExpBool', 'ExpPlus', 'ExpMinus', 'ExpTimes', 'ExpLt', 'ExpIf'
+]
 
 
 class Value(object):
-    @type_checking
     def __str__(self) -> str:
         raise NotImplementedError
 
-    @type_checking
     def __eq__(self, other: 'Value') -> bool:
         raise NotImplementedError
 
@@ -67,12 +66,7 @@ class ValueBool(Value, Token):
 
 
 class Exp(object):
-    @type_checking
-    def __eq__(self, other: 'Exp') -> bool:
-        raise NotImplementedError
-
     @property
-    @type_checking
     def value(self) -> Value:
         raise NotImplementedError
 
@@ -255,4 +249,4 @@ class ExpIf(Exp, TrinaryOp):
             else:
                 return self.c.value
         else:
-            raise EvaluationError('condition {} is not ValueBool type'.format(self.a))
+            raise ValueError('condition {} is not ValueBool type'.format(self.a))

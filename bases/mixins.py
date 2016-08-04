@@ -6,17 +6,14 @@ class RenderError(Exception):
 
 
 class BaseToken(object):
-    @type_checking
     def sub(self, index: int) -> str:
         raise NotImplementedError
 
-    @type_checking
     def __str__(self) -> str:
         raise NotImplementedError
 
 
 class Token(BaseToken):
-    @type_checking
     def sub(self, index: int) -> str:
         raise RenderError
 

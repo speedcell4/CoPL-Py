@@ -214,6 +214,25 @@ def curry2(fn):
     return wrapper1
 
 
+def curry5(fn):
+    def wrapper1(a):
+        def wrapper2(b):
+            def wrapper3(c):
+                def wrapper4(d):
+                    def wrapper5(e):
+                        return fn(a, b, c, d, e)
+
+                    return wrapper5
+
+                return wrapper4
+
+            return wrapper3
+
+        return wrapper2
+
+    return wrapper1
+
+
 def binary_op(op: BinaryOp) -> Parser:
     return pure(curry2(op)) << string2(op.operator)
 
