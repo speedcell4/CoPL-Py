@@ -10,6 +10,7 @@ from EvalML4 import EvalML4
 from EvalNatExp import EvalNatExp
 from Nat import Nat
 from ReduceNatExp import ReduceNatExp
+from TypingML4 import TypingML4
 from bases.util import generate_unittest
 
 logging.basicConfig(
@@ -29,6 +30,7 @@ eval_ml_1_err = generate_unittest(r'EvalML1Err', EvalML1Err, range(31, 34))
 eval_ml_2 = generate_unittest(r'EvalML2', EvalML2, range(34, 40))
 eval_ml_3 = generate_unittest(r'EvalML3', EvalML3, range(40, 54))
 eval_ml_4 = generate_unittest(r'EvalML4', EvalML4, range(70, 78))
+typing_ml_4 = generate_unittest(r'TypingML4', TypingML4, range(80, 97))
 
 if __name__ == '__main__':
     unittest.main()

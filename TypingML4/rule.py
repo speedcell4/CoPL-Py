@@ -25,7 +25,7 @@ class TInt(Rule):
         env, e, t = assertion.args
         logging.debug(r'TInt: {}'.format(assertion))
         if isinstance(e, ExpInt):
-            t.link(TypesInt())
+            t.define(TypesInt())
             if isinstance(t, TypesInt):
                 return []
 
@@ -37,7 +37,7 @@ class TBool(Rule):
     def __call__(self, assertion: EvalToType) -> List[Assertion]:
         env, e, t = assertion.args
         if isinstance(e, ExpBool):
-            t.link(TypesBool())
+            t.define(TypesBool())
             if isinstance(t, TypesBool):
                 return []
 
@@ -52,12 +52,12 @@ class TIf(Rule):
             e1, e2, e3 = e.a, e.b, e.c
             t1, t2, t3, tb = env[e1], env[e2], env[e3], TypesBool()
 
-            t1.link(tb)
-            t2.link(t3)
-            t3.link(t2)
+            t1.define(tb)
+            t2.define(t3)
+            t3.define(t2)
 
             if t2 == t3:
-                t.link(t2)
+                t.define(t2)
                 return [
                     EvalToType(env, e1, t1),
                     EvalToType(env, e2, t2),
@@ -75,9 +75,9 @@ class TPlus(Rule):
             e1, e2 = e.a, e.b
             t1, t2, ti = env[e1], env[e2], TypesInt()
 
-            t1.link(ti)
-            t2.link(ti)
-            t.link(ti)
+            t1.define(ti)
+            t2.define(ti)
+            t.define(ti)
 
             return [
                 EvalToType(env, e1, t1),
@@ -95,9 +95,9 @@ class TMinus(Rule):
             e1, e2 = e.a, e.b
             t1, t2, ti = env[e1], env[e2], TypesInt()
 
-            t1.link(ti)
-            t2.link(ti)
-            t.link(ti)
+            t1.define(ti)
+            t2.define(ti)
+            t.define(ti)
 
             return [
                 EvalToType(env, e1, t1),
@@ -115,9 +115,9 @@ class TTime(Rule):
             e1, e2 = e.a, e.b
             t1, t2, ti = env[e1], env[e2], TypesInt()
 
-            t1.link(ti)
-            t2.link(ti)
-            t.link(ti)
+            t1.define(ti)
+            t2.define(ti)
+            t.define(ti)
 
             return [
                 EvalToType(env, e1, t1),
@@ -135,9 +135,9 @@ class TLt(Rule):
             e1, e2 = e.a, e.b
             t1, t2, ti, tb = env[e1], env[e2], TypesInt(), TypesBool()
 
-            t1.link(ti)
-            t2.link(ti)
-            t.link(tb)
+            t1.define(ti)
+            t2.define(ti)
+            t.define(tb)
 
             return [
                 EvalToType(env, e1, t1),
@@ -152,7 +152,7 @@ class TVar(Rule):
     def __call__(self, assertion: EvalToType) -> List[Assertion]:
         env, e, t = assertion.args
         if isinstance(e, ExpVar):
-            t.link(env[e])
+            t.define(env[e])
             if env[e] == t:
                 return []
 
@@ -172,7 +172,7 @@ class TLet(Rule):
             logging.debug(r'TLet[e1] {} :: {}'.format(e1, t1))
             t2 = env.update(x, t1)[e2]
             logging.debug(r'TLet[e2] {} :: {}'.format(e2, t2))
-            t.link(t2)
+            t.define(t2)
             logging.debug(r'TLet {} <-> {}'.format(t, t2))
             return [
                 EvalToType(env, e1, t1),
@@ -192,7 +192,7 @@ class TFun(Rule):
             x, e = fun.x, fun.e
             t1 = TypesUnkown()
             t2 = env.update(x, t1)[e]
-            t.link(TypesFun(t1, t2))
+            t.define(TypesFun(t1, t2))
             return [
                 EvalToType(env.update(x, t1), e, t2)
             ]
@@ -207,10 +207,19 @@ class TApp(Rule):
         if isinstance(e, ExpApp):
             e1, e2 = e.e1, e.e2
             t12, t1 = env[e1], env[e2]
-            t12.link(TypesFun(t1, t2))
+
+            if isinstance(t12, TypesUnkown):
+                t12.define(TypesFun(t1, t2))
+
+            if isinstance(t1, TypesUnkown) and isinstance(t12, TypesFun):
+                t1.define(t12.a)
+
+            if isinstance(t2, TypesUnkown) and isinstance(t12, TypesFun):
+                t2.define(t12.b)
+
             return [
                 EvalToType(env, e1, t12),
-                EvalToType(env, e2, t2),
+                EvalToType(env, e2, t1),
             ]
 
 
@@ -224,8 +233,8 @@ class TLetRec(Rule):
             x, y, e1, e2 = e.x, e.y, e.e1, e.e2
             t1, t2 = TypesUnkown(), TypesUnkown()
             t12 = TypesFun(t1, t2)
-            t2.link(env.update(x, t12).update(y, t1)[e1])
-            t.link(env.update(x, t12)[e2])
+            t2.define(env.update(x, t12).update(y, t1)[e1])
+            t.define(env.update(x, t12)[e2])
             return [
                 EvalToType(env.update(x, t12).update(y, t1), e1, t2),
                 EvalToType(env.update(x, t12), e2, t),
@@ -239,7 +248,7 @@ class TNil(Rule):
     def __call__(self, assertion: EvalToType) -> List[Assertion]:
         env, e, t = assertion.args
         if isinstance(e, ExpNil):
-            t.link(TypesList(TypesUnkown()))
+            t.define(TypesList(TypesUnkown()))
             if isinstance(t, TypesList):
                 return []
 
@@ -256,10 +265,19 @@ class TCons(Rule):
             e1, e2 = e.a, e.b
             t, ts_ = env[e1], env[e2]
 
-            ts_.link(TypesList(t))
-            ts.link(ts_)
+            ts_.define(TypesList(t))
+            ts.define(TypesList(t))
+            if isinstance(ts, TypesList):
+                t.define(ts.a)
+            if isinstance(ts_, TypesList):
+                t.define(ts_.a)
 
-            if ts == ts_:
+            logging.debug(r'T-Cons: final')
+            logging.debug(r'T-Cons: {} :: {}'.format(e1, t))
+            logging.debug(r'T-Cons: {} :: {}'.format(e2, ts_))
+            logging.debug(r'T-Cons: {} '.format(ts))
+
+            if t == ts_.a == ts.a:
                 return [
                     EvalToType(env, e1, t),
                     EvalToType(env, e2, ts_),
@@ -276,9 +294,9 @@ class TMatch(Rule):
             e1, e2, x, y, e3 = e.e1, e.e2, e.x, e.y, e.e3
             t1s, t2 = env[e1], env[e2]
             t1 = TypesUnkown()
-            t1s.link(TypesList(t1))
-            t2.link(env.update(x, t1).update(y, t1s)[e3])
-            t.link(t2)
+            t1s.define(TypesList(t1))
+            t2.define(env.update(x, t1).update(y, t1s)[e3])
+            t.define(t2)
             return [
                 EvalToType(env, e1, t1s),
                 EvalToType(env, e2, t2),

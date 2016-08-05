@@ -152,11 +152,6 @@ class DerivationSystem(object):
 
 derivation_system = DerivationSystem()
 
-logging.basicConfig(
-    format=r'[%(levelname)s- %(funcName)s]%(asctime)s: %(message)s',
-    datefmt='%Y/%m/%d-%H:%M:%S',
-    level=logging.WARNING,
-)
 
 if __name__ == '__main__':
     r1 = RegexConcatenation(

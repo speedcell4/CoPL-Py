@@ -1,5 +1,3 @@
-import logging
-
 from EvalML4.parser import var, exp
 from TypingML4.data import TypesInt, TypesBool, TypesFun, TypesList, EnvItem, Env
 from TypingML4.rule import EvalToType
@@ -35,12 +33,6 @@ with Parser() as assertion:
     eval_to_env = (pure(lambda env: lambda e: lambda t: EvalToType(env, e, t))) + \
                   (env << string2(r'|-')) + (exp << string2(r':')) + types
     assertion.define(eval_to_env)
-
-logging.basicConfig(
-    format=r'[%(levelname)s- %(funcName)s]%(asctime)s: %(message)s',
-    datefmt='%Y/%m/%d-%H:%M:%S',
-    level=logging.DEBUG,
-)
 
 if __name__ == '__main__':
     a = eval_to_env.run(r'|- 3 + 5 : int')

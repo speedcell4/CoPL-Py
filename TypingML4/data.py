@@ -20,11 +20,13 @@ class Types(object):
     def __eq__(self, other: 'Types') -> bool:
         raise NotImplementedError
 
-    def link(self, types: 'Types'):
+    def define(self, other: 'Types'):
         raise NotImplementedError
 
-    def get_from(self, types: 'Types'):
-        raise NotImplementedError
+    @type_checking
+    def get_from(self, other: 'Types'):
+        self.__class__ = other.__class__
+        self.__dict__ = other.__dict__
 
 
 class TypesUnkown(Types):
@@ -33,16 +35,8 @@ class TypesUnkown(Types):
         return isinstance(other, TypesUnkown)
 
     @type_checking
-    def link(self, types: 'Types'):
-        self.__class__ = types.__class__
-        self.__dict__ = types.__dict__
-
-    @type_checking
-    def get_from(self, types: 'Types'):
-        if isinstance(types, TypesUnkown):
-            pass
-        else:
-            self.link(types)
+    def define(self, other: 'Types'):
+        self.get_from(other)
 
     @type_checking
     def __str__(self) -> str:
@@ -51,13 +45,11 @@ class TypesUnkown(Types):
 
 class TypesInt(Types, Token):
     @type_checking
-    def link(self, types: 'Types'):
-        if isinstance(types, TypesUnkown):
-            types.link(self)
-
-    @type_checking
-    def get_from(self, types: 'Types'):
-        pass
+    def define(self, other: 'Types'):
+        if isinstance(other, TypesUnkown):
+            other.define(self)
+        elif isinstance(other, TypesInt):
+            pass
 
     @type_checking
     def __eq__(self, other: 'Types') -> bool:
@@ -70,13 +62,11 @@ class TypesInt(Types, Token):
 
 class TypesBool(Types, Token):
     @type_checking
-    def link(self, types: 'Types'):
-        if isinstance(types, TypesUnkown):
-            types.link(self)
-
-    @type_checking
-    def get_from(self, types: 'Types'):
-        pass
+    def define(self, other: 'Types'):
+        if isinstance(other, TypesUnkown):
+            other.define(self)
+        elif isinstance(other, TypesBool):
+            pass
 
     @type_checking
     def __eq__(self, other: 'Types') -> bool:
@@ -94,17 +84,12 @@ class TypesFun(Types, BinaryOp):
     precedence = 1
 
     @type_checking
-    def link(self, types: 'Types'):
-        if isinstance(types, TypesUnkown):
-            types.link(self)
-        elif isinstance(types, TypesFun):
-            self.a.link(types.a)
-            self.b.link(types.b)
-
-    def get_from(self, types: 'Types'):
-        if isinstance(types, TypesFun):
-            self.a.get_from(types.a)
-            self.b.get_from(types.b)
+    def define(self, other: 'Types'):
+        if isinstance(other, TypesUnkown):
+            other.define(self)
+        elif isinstance(other, TypesFun):
+            self.a.define(other.a)
+            self.b.define(other.b)
 
     @type_checking
     def __init__(self, a: Types, b: Types):
@@ -130,16 +115,11 @@ class TypesFun(Types, BinaryOp):
 
 class TypesList(Types, UnaryOp):
     @type_checking
-    def link(self, types: 'Types'):
-        if isinstance(types, TypesUnkown):
-            types.link(self)
-        elif isinstance(types, TypesFun):
-            self.a.link(types.a)
-
-    @type_checking
-    def get_from(self, types: 'Types'):
-        if isinstance(types, TypesList):
-            self.a.get_from(types.a)
+    def define(self, other: 'Types'):
+        if isinstance(other, TypesUnkown):
+            other.define(self)
+        elif isinstance(other, TypesFun):
+            self.a.define(other.a)
 
     @type_checking
     def __init__(self, a: Types):
@@ -211,9 +191,9 @@ class Env(object):
         e1, e2, e3 = e.a, e.b, e.c
         t1, t2, t3, tb = self[e1], self[e2], self[e3], TypesBool()
 
-        t1.link(tb)
-        t2.link(t3)
-        t3.link(t2)
+        t1.define(tb)
+        t2.define(t3)
+        t3.define(t2)
 
         if isinstance(t1, TypesBool):
             if t2 == t3:
@@ -228,8 +208,8 @@ class Env(object):
         e1, e2 = e.a, e.b
         t1, t2, ti = self[e1], self[e2], TypesInt()
 
-        t1.link(ti)
-        t2.link(ti)
+        t1.define(ti)
+        t2.define(ti)
 
         if not isinstance(t1, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt-l'.format(e1, t1))
@@ -243,9 +223,9 @@ class Env(object):
         t1, t2, ti = self[e1], self[e2], TypesInt()
 
         if isinstance(t1, TypesUnkown):
-            t1.link(ti)
+            t1.define(ti)
         if isinstance(t2, TypesUnkown):
-            t2.link(ti)
+            t2.define(ti)
 
         if not isinstance(t1, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt-l'.format(e1, t1))
@@ -259,9 +239,9 @@ class Env(object):
         t1, t2, ti = self[e1], self[e2], TypesInt()
 
         if isinstance(t1, TypesUnkown):
-            t1.link(ti)
+            t1.define(ti)
         if isinstance(t2, TypesUnkown):
-            t2.link(ti)
+            t2.define(ti)
 
         if not isinstance(t1, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt-l'.format(e1, t1))
@@ -275,9 +255,9 @@ class Env(object):
         t1, t2, ti, tb = self[e1], self[e2], TypesInt(), TypesBool()
 
         if isinstance(t1, TypesUnkown):
-            t1.link(ti)
+            t1.define(ti)
         if isinstance(t2, TypesUnkown):
-            t2.link(ti)
+            t2.define(ti)
 
         if not isinstance(t1, TypesInt):
             raise TypeError(r'{} :: {} should be TypeInt-l'.format(e1, t1))
@@ -311,10 +291,10 @@ class Env(object):
         e1, e2 = e.e1, e.e2
         t12, t1, t2 = self[e1], self[e2], TypesUnkown()
 
-        t12.link(TypesFun(t1, t2))
+        t12.define(TypesFun(t1, t2))
 
         if isinstance(t12, TypesFun):
-            t1.link(t12.a)
+            t1.define(t12.a)
             if t12.a == t1:
                 return t12.b
 
@@ -340,10 +320,10 @@ class Env(object):
         e1, e2 = e.a, e.b
         t1, t2s = self[e1], self[e2]
 
-        t2s.link(TypesList(t1))
+        t2s.define(TypesList(t1))
 
         if isinstance(t2s, TypesList):
-            t1.link(t2s.a)
+            t1.define(t2s.a)
             logging.debug(r'__getitem__ExpCons__[e1]: {} :: {}'.format(e1, t1))
             logging.debug(r'__getitem__ExpCons__[e2]: {} :: {}'.format(e2, t2s))
             if t1 == t2s.a:
@@ -355,11 +335,11 @@ class Env(object):
         e1, e2, x, y, e3 = e.e1, e.e2, e.x, e.y, e.e3
         t_s, t = self[e1], self[e2]
 
-        t_s.link(TypesList(TypesUnkown()))
+        t_s.define(TypesList(TypesUnkown()))
 
         if isinstance(t_s, TypesList):
             t3 = self.update(x, t_s.a).update(y, t_s)[e3]
-            t.link(t3)
+            t.define(t3)
             if t == t3:
                 return t
         raise TypeError(r'{} :: {} could not match {} :: {} or {} :: {}'.format(e1, t_s, e2, t, e3, t))
