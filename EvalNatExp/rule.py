@@ -3,7 +3,7 @@ from typing import List
 from EvalNatExp.data import Exp, ExpNat, ExpPlus, ExpTimes
 from Nat.data import Nat
 from Nat.rule import PlusIs, TimesIs, PZero, PSucc, TZero, TSucc
-from bases.deduction import Assertion, Rule, System
+from bases.derivation import Assertion, Rule, System
 from bases.util import type_checking
 
 

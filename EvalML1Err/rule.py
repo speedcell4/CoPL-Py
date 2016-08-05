@@ -3,7 +3,7 @@ from typing import List
 from EvalML1.data import ValueInt, ValueBool, Exp, ExpPlus, ExpMinus, ExpTimes, ExpLt, ExpIf
 from EvalML1.rule import EvalTo, EInt, EBool, EIfT, EIfF, EPlus, EMinus, ETimes, ELt, BPlus, BMinus, BTimes, BLt
 from EvalML1Err.data import ResErr
-from bases.deduction import Assertion, Rule, System
+from bases.derivation import Assertion, Rule, System
 from bases.util import type_checking
 
 

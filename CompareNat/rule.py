@@ -1,7 +1,7 @@
 from typing import List
 
 from CompareNat.data import Nat, Z, S
-from bases.deduction import Assertion, Rule, System
+from bases.derivation import Assertion, Rule, System
 from bases.util import type_checking
 
 

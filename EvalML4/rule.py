@@ -3,7 +3,7 @@ from typing import List
 from EvalML3.rule import EvalToEnv, EInt, EBool, EIfT, EIfF, EPlus, EMinus, ETimes, ELt, ELet, EFun, EApp, \
     ELetRec, EAppRec, BPlus, BMinus, BTimes, BLt
 from EvalML4.data import *
-from bases.deduction import Assertion, Rule, System
+from bases.derivation import Assertion, Rule, System
 from bases.util import type_checking
 
 

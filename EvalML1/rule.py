@@ -1,7 +1,7 @@
 from typing import List
 
 from EvalML1.data import Exp, ExpInt, ExpBool, ExpPlus, ExpMinus, ExpTimes, ExpLt, ExpIf, Value, ValueInt, ValueBool
-from bases.deduction import Assertion, Rule, System
+from bases.derivation import Assertion, Rule, System
 from bases.util import type_checking
 
 
