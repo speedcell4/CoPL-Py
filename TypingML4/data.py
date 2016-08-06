@@ -59,7 +59,7 @@ class TypesInt(Types, Token):
     def link(self, other: 'Types'):
         if isinstance(other, TypesUnkown):
             other.get_from(self)
-        elif isinstance(other, TypesInt):
+        elif isinstance(other, self.__class__):
             pass
 
     @type_checking
@@ -80,7 +80,7 @@ class TypesBool(Types, Token):
     def link(self, other: 'Types'):
         if isinstance(other, TypesUnkown):
             other.get_from(self)
-        elif isinstance(other, TypesBool):
+        elif isinstance(other, self.__class__):
             pass
 
     @type_checking
@@ -109,7 +109,7 @@ class TypesFun(Types, BinaryOp):
     def link(self, other: 'Types'):
         if isinstance(other, TypesUnkown):
             other.get_from(self)
-        elif isinstance(other, TypesFun):
+        elif isinstance(other, self.__class__):
             self.a.link(other.a)
             self.b.link(other.b)
 
@@ -151,7 +151,7 @@ class TypesList(Types, UnaryOp):
         logging.debug(r'TypesList {} <-> {}'.format(self, other))
         if isinstance(other, TypesUnkown):
             other.get_from(self)
-        elif isinstance(other, TypesList):
+        elif isinstance(other, self.__class__):
             self.a.link(other.a)
 
             other.a.link(self.a)
@@ -323,7 +323,7 @@ class Env(object):
 
     @type_checking
     def __getitem__ExpApp__(self, e: ExpApp) -> Types:
-        e1, e2 = e.e1, e.e2
+        e1, e2 = e.a, e.b
         t12, t1, t2 = self[e1], self[e2], TypesUnkown()
 
         t12.link(TypesFun(t1, t2))

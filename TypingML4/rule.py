@@ -205,7 +205,7 @@ class TApp(Rule):
     def __call__(self, assertion: EvalToType) -> List[Assertion]:
         env, e, t2 = assertion.args
         if isinstance(e, ExpApp):
-            e1, e2 = e.e1, e.e2
+            e1, e2 = e.a, e.b
             t12, t1 = env[e1], env[e2]
 
             if isinstance(t12, TypesUnkown):
@@ -239,7 +239,7 @@ class TLetRec(Rule):
             logging.debug(r'T-LetRec {} <-> {}'.format(t2, t2_))
             t2.link(t2_)
             t_ = env.update(x, t12)[e2]
-            t_.link(t)
+            t.link(t_)
             logging.debug(r'T-LetRec {} <-> {}'.format(t, t_))
             logging.debug(r'T-LetRec {} |- {} :: {}'.format(env.update(x, t12), e2, t_))
             return [

@@ -1,0 +1,1 @@
+|- let rec map = fun f -> fun l -> match l with [] -> [] | x :: y -> {f x} :: {{map f} y} in {{map (fun x -> x < 3)} (4 :: 5 :: 1 :: [])} : {bool list}

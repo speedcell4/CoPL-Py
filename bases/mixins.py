@@ -67,7 +67,7 @@ class BinaryOp(Operator):
             if isinstance(child, BinaryOp) and child.precedence == self.precedence:
                 if self.associate != index:
                     return r'({})'.format(child)
-        elif isinstance(child, Function):
+        elif index == 0 and isinstance(child, Function):
             return r'({})'.format(child)
         return r'{}'.format(child)
 

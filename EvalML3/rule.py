@@ -29,7 +29,7 @@ class EApp(Rule):
         logging.debug(r'EApp: {} |- {} evalto {}'.format(env, e, v))
 
         if isinstance(e, ExpApp):
-            e1, e2 = e.e1, e.e2
+            e1, e2 = e.a, e.b
             v1, v2 = env[e1], env[e2]
             if isinstance(v1, ValueFn):
                 env2, x, e0 = v1.env, v1.x, v1.e
@@ -56,7 +56,7 @@ class EAppRec(Rule):
     def __call__(self, assertion: EvalToEnv) -> List[Assertion]:
         env, e, v = assertion.args
         if isinstance(e, ExpApp):
-            e1, e2 = e.e1, e.e2
+            e1, e2 = e.a, e.b
             v1, v2 = env[e1], env[e2]
             if isinstance(v1, ValueRec):
                 env2, x, y, e0 = v1.env, v1.x, v1.y, v1.e

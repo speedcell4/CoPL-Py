@@ -1,7 +1,7 @@
 import logging
 
 from EvalML2.data import *
-from bases.mixins import Function
+from bases.mixins import Function, BinaryOp, Token
 from bases.util import type_checking
 
 __all__ = [
@@ -58,15 +58,33 @@ class ExpFun(Exp, Function):
         return r'fun {} -> {}'.format(self.x, self.e)
 
 
-class ExpApp(Exp, Function):
+class ExpApp(Exp, BinaryOp):
+    precedence = 100000
+    associate = 1
+
+    operator = r''
+
     @type_checking
-    def __init__(self, e1: Exp, e2: Exp):
-        self.e1 = e1
-        self.e2 = e2
+    def __init__(self, a: Exp, b: Exp):
+        self.a = a
+        self.b = b
 
     @type_checking
     def __str__(self) -> str:
-        return r'{} ({})'.format(self.e1, self.e2)
+        return r'{} {}'.format(self.sub(0), self.sub(1))
+
+    @type_checking
+    def sub(self, index: int) -> str:
+        if index == 0:
+            if isinstance(self.a, (ExpVar, ExpApp)):
+                return r'{}'.format(self.a)
+            else:
+                return r'({})'.format(self.a)
+        else:
+            if isinstance(self.b, Token) and not isinstance(self.b, Function):
+                return r'{}'.format(self.b)
+            else:
+                return r'({})'.format(self.b)
 
 
 class ExpLetRec(Exp, Function):
@@ -93,7 +111,7 @@ Env.__getitem__ExpFun__ = __getitem__ExpFun__
 @type_checking
 def __getitem__ExpApp__(self, e: ExpApp) -> Value:
     logging.debug(r'ExpCall {}'.format(e))
-    e1, e2 = e.e1, e.e2
+    e1, e2 = e.a, e.b
     logging.debug(r'ExpCall {} {} {} {}'.format(e1, type(e1), e2, type(e2)))
     v1, v2 = self[e1], self[e2]
     logging.debug(r'ExpCall {} {} {} {}'.format(v1, type(v1), v2, type(v2)))

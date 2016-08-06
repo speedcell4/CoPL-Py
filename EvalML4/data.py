@@ -35,7 +35,7 @@ class ValueCons(Value, Token):
 
     @type_checking
     def __str__(self) -> str:
-        return r'({} :: {})'.format(self.v1, self.v2)
+        return r'{} :: {}'.format(self.v1, self.v2)
 
 
 class ExpNil(Exp, Token):
@@ -70,10 +70,6 @@ class ExpCons(Exp, BinaryOp):
     @property
     def value(self) -> Value:
         raise NotImplementedError
-
-    @type_checking
-    def __str__(self) -> str:
-        return r'({} {} {})'.format(self.sub(0), self.operator, self.sub(1))
 
 
 @type_checking
