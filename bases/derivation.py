@@ -11,6 +11,9 @@ class Assertion(object):
     def __str__(self):
         return self.template.format(*self.args)
 
+    def __repr__(self):
+        return str(self)
+
 
 class Rule(object):
     name = ''
@@ -44,8 +47,6 @@ class System(object):
                     return head + middle + '\n' + indent(depth) + '}'
             except AssertionError:
                 pass
-            except Exception as error:
-                logging.error('{}'.format(error))
 
 
 class Solver(object):

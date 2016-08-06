@@ -1,21 +1,21 @@
  |- let s = fun f -> fun g -> fun x -> f (x) (g (x)) in let k1 = fun x -> fun y -> x in let k2 = fun x -> fun y -> x in s (k1) (k2) : int -> int by T-Let {
-   |- fun f -> fun g -> fun x -> f (x) (g (x)) : (int -> ((TypeUnkown -> TypeUnkown) -> int)) -> ((int -> (TypeUnkown -> TypeUnkown)) -> (int -> int)) by T-Fun {
-    f : int -> ((TypeUnkown -> TypeUnkown) -> int) |- fun g -> fun x -> f (x) (g (x)) : (int -> (TypeUnkown -> TypeUnkown)) -> (int -> int) by T-Fun {
-      f : int -> ((TypeUnkown -> TypeUnkown) -> int),g : int -> (TypeUnkown -> TypeUnkown) |- fun x -> f (x) (g (x)) : int -> int by T-Fun {
-        f : int -> ((TypeUnkown -> TypeUnkown) -> int),g : int -> (TypeUnkown -> TypeUnkown),x : int |- f (x) (g (x)) : int by T-App {
-          f : int -> ((TypeUnkown -> TypeUnkown) -> int),g : int -> (TypeUnkown -> TypeUnkown),x : int |- f (x) : (TypeUnkown -> TypeUnkown) -> int by T-App {
-            f : int -> ((TypeUnkown -> TypeUnkown) -> int),g : int -> (TypeUnkown -> TypeUnkown),x : int |- f : int -> ((TypeUnkown -> TypeUnkown) -> int) by T-Var {
+   |- fun f -> fun g -> fun x -> f (x) (g (x)) : (int -> ((int list -> int list) -> int)) -> ((int -> (int list -> int list)) -> (int -> int)) by T-Fun {
+    f : int -> ((int list -> int list) -> int) |- fun g -> fun x -> f (x) (g (x)) : (int -> (int list -> int list)) -> (int -> int) by T-Fun {
+      f : int -> ((int list -> int list) -> int),g : int -> (int list -> int list) |- fun x -> f (x) (g (x)) : int -> int by T-Fun {
+        f : int -> ((int list -> int list) -> int),g : int -> (int list -> int list),x : int |- f (x) (g (x)) : int by T-App {
+          f : int -> ((int list -> int list) -> int),g : int -> (int list -> int list),x : int |- f (x) : (int list -> int list) -> int by T-App {
+            f : int -> ((int list -> int list) -> int),g : int -> (int list -> int list),x : int |- f : int -> ((int list -> int list) -> int) by T-Var {
 
             };
-            f : int -> ((TypeUnkown -> TypeUnkown) -> int),g : int -> (TypeUnkown -> TypeUnkown),x : int |- x : int by T-Var {
+            f : int -> ((int list -> int list) -> int),g : int -> (int list -> int list),x : int |- x : int by T-Var {
 
             }
           };
-          f : int -> ((TypeUnkown -> TypeUnkown) -> int),g : int -> (TypeUnkown -> TypeUnkown),x : int |- g (x) : TypeUnkown -> TypeUnkown by T-App {
-            f : int -> ((TypeUnkown -> TypeUnkown) -> int),g : int -> (TypeUnkown -> TypeUnkown),x : int |- g : int -> (TypeUnkown -> TypeUnkown) by T-Var {
+          f : int -> ((int list -> int list) -> int),g : int -> (int list -> int list),x : int |- g (x) : int list -> int list by T-App {
+            f : int -> ((int list -> int list) -> int),g : int -> (int list -> int list),x : int |- g : int -> (int list -> int list) by T-Var {
 
             };
-            f : int -> ((TypeUnkown -> TypeUnkown) -> int),g : int -> (TypeUnkown -> TypeUnkown),x : int |- x : int by T-Var {
+            f : int -> ((int list -> int list) -> int),g : int -> (int list -> int list),x : int |- x : int by T-Var {
 
             }
           }
@@ -23,32 +23,32 @@
       }
     }
   };
-  s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)) |- let k1 = fun x -> fun y -> x in let k2 = fun x -> fun y -> x in s (k1) (k2) : int -> int by T-Let {
-    s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)) |- fun x -> fun y -> x : int -> ((TypeUnkown -> int) -> int) by T-Fun {
-      s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),x : int |- fun y -> x : (TypeUnkown -> int) -> int by T-Fun {
-        s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),x : int,y : TypeUnkown -> int |- x : int by T-Var {
+  s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)) |- let k1 = fun x -> fun y -> x in let k2 = fun x -> fun y -> x in s (k1) (k2) : int -> int by T-Let {
+    s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)) |- fun x -> fun y -> x : int -> ((int list -> int) -> int) by T-Fun {
+      s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),x : int |- fun y -> x : (int list -> int) -> int by T-Fun {
+        s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),x : int,y : int list -> int |- x : int by T-Var {
 
         }
       }
     };
-    s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),k1 : int -> ((TypeUnkown -> int) -> int) |- let k2 = fun x -> fun y -> x in s (k1) (k2) : int -> int by T-Let {
-      s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),k1 : int -> ((TypeUnkown -> int) -> int) |- fun x -> fun y -> x : int -> (TypeUnkown -> int) by T-Fun {
-        s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),k1 : int -> ((TypeUnkown -> int) -> int),x : int |- fun y -> x : TypeUnkown -> int by T-Fun {
-          s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),k1 : int -> ((TypeUnkown -> int) -> int),x : int,y : TypeUnkown |- x : int by T-Var {
+    s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),k1 : int -> ((int list -> int) -> int) |- let k2 = fun x -> fun y -> x in s (k1) (k2) : int -> int by T-Let {
+      s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),k1 : int -> ((int list -> int) -> int) |- fun x -> fun y -> x : int -> (int list -> int) by T-Fun {
+        s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),k1 : int -> ((int list -> int) -> int),x : int |- fun y -> x : int list -> int by T-Fun {
+          s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),k1 : int -> ((int list -> int) -> int),x : int,y : int list |- x : int by T-Var {
 
           }
         }
       };
-      s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),k1 : int -> ((TypeUnkown -> int) -> int),k2 : int -> (TypeUnkown -> int) |- s (k1) (k2) : int -> int by T-App {
-        s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),k1 : int -> ((TypeUnkown -> int) -> int),k2 : int -> (TypeUnkown -> int) |- s (k1) : (int -> (TypeUnkown -> int)) -> (int -> int) by T-App {
-          s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),k1 : int -> ((TypeUnkown -> int) -> int),k2 : int -> (TypeUnkown -> int) |- s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)) by T-Var {
+      s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),k1 : int -> ((int list -> int) -> int),k2 : int -> (int list -> int) |- s (k1) (k2) : int -> int by T-App {
+        s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),k1 : int -> ((int list -> int) -> int),k2 : int -> (int list -> int) |- s (k1) : (int -> (int list -> int)) -> (int -> int) by T-App {
+          s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),k1 : int -> ((int list -> int) -> int),k2 : int -> (int list -> int) |- s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)) by T-Var {
 
           };
-          s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),k1 : int -> ((TypeUnkown -> int) -> int),k2 : int -> (TypeUnkown -> int) |- k1 : int -> ((TypeUnkown -> int) -> int) by T-Var {
+          s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),k1 : int -> ((int list -> int) -> int),k2 : int -> (int list -> int) |- k1 : int -> ((int list -> int) -> int) by T-Var {
 
           }
         };
-        s : (int -> ((TypeUnkown -> int) -> int)) -> ((int -> (TypeUnkown -> int)) -> (int -> int)),k1 : int -> ((TypeUnkown -> int) -> int),k2 : int -> (TypeUnkown -> int) |- k2 : int -> (TypeUnkown -> int) by T-Var {
+        s : (int -> ((int list -> int) -> int)) -> ((int -> (int list -> int)) -> (int -> int)),k1 : int -> ((int list -> int) -> int),k2 : int -> (int list -> int) |- k2 : int -> (int list -> int) by T-Var {
 
         }
       }
